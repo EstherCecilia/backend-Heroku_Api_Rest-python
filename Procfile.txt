@@ -1,1 +1,1 @@
-web : python samsung.py run
+web : python samsung.py 
