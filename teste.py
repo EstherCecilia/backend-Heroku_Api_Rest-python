@@ -1,17 +1,13 @@
 # -*- coding: cp1252 -*-
 from flask import Flask, request
-from flask_restful import Resource, Api
-import json
-from models import *
 
 app = Flask(__name__)
 api = Api(app)
 
 
 
-@app.route('/', methods=['GET'])
+@app.route('/')
 def pessoas():
-    if request.method == 'GET' :
         return "Hello"
 
     
