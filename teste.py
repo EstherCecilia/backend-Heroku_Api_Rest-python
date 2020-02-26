@@ -10,7 +10,7 @@ api = Api(app)
 
 
 @app.route('/', methods=['GET'])
-def pessoas(id):
+def pessoas():
     if request.method == 'GET' :
         return "Hello"
 
