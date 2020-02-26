@@ -1,1 +1,1 @@
-web : gunicorn app:teste
+web : python samsung.py
