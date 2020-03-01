@@ -3,6 +3,7 @@ from flask import Flask, request
 from flask_restful import Resource, Api
 import json
 from models import *
+from random import *
 
 app = Flask(__name__)
 api = Api(app)
@@ -169,7 +170,7 @@ class Lista_salas(Resource):
     
     def post(self):
         dados = request.json
-        sala = Salas(nome=dados['nome'], senha=dados['senha'])
+        sala = Salas(nome=dados['nome'], senha=dados['senha'], publica=dados['publica'])
         sala.save()
         response = {
                 'nome' : sala.nome,
@@ -188,7 +189,7 @@ class Lista_salas(Resource):
 class Lista_doencas(Resource):
     def get(self):
         doencas = Doencas.query.all()
-        response = [{'id':i.id, 'nome':i.nome, 'sintoma': i.sintoma.nome, 'prevencao': i.prevencao.nome} for i in doencas]
+        response = [{'id':i.id, 'nome':i.nome, 'tipo':i.tipo, 'agente':i.agente, 'sintomas':[{'nome':s.nome} for s in i.sintomas], 'prevencao':[{'nome':s.nome} for s in i.prevencao]} for i in doencas]
         return response
     
 
@@ -196,22 +197,23 @@ class Lista_doencas(Resource):
         dados = request.json
         sintoma = Sintomas.query.filter_by(nome=dados['sintoma']).first()
         prevencao = Prevencoes.query.filter_by(nome=dados['prevencao']).first()
-        doenca = Doencas(nome=dados['nome'], sintoma=sintoma, prevencao=prevencao)
+        doenca = Doencas(nome=dados['nome'], agente=dados['agente'], tipo=dados['tipo'], sintomas=sintoma, prevencao=prevencao)
         doenca.save()
-        response = {
-            'nome' : doenca.nome,
-            'sintoma': doenca.sintoma.nome,
-            'prevencao': doenca.prevencao.nome,
-            'id':doenca.id
-        }
-        return response
+        return "Doença inserida com sucesso!"
         
 
 
 class Lista_sessoes(Resource):
-    def get(self):
-        sessao = Sessoes.query.all()
-        response = [{'id':i.id, 'nome':i.nome, 'doenca': i.doenca.nome, 'sala': i.sala.nome} for i in sessao]
+    def get(self, id):
+        doenca = Doencas.query.all()
+        #limitar doencas
+        sala = Salas.query.all()
+        responSala = {'id':sala[id].id, 'nome':sala[id].nome, 'senha':sala[id].senha}
+        responDoenca = [{'id':i.id, 'nome':i.nome, 'tipo':i.tipo, 'agente':i.agente,'sintomas':[{'nome':s.nome} for s in i.sintomas], 'prevencao':[{'nome':s.nome} for s in i.prevencao] } for i in doenca]
+
+        items = randrange(1000, 99999)
+
+        response = {'id':items,'sala':responSala,'doencas':responDoenca}
         return response
     
 
@@ -243,7 +245,7 @@ api.add_resource(Lista_salas, '/sala')
 
 api.add_resource(Lista_doencas, '/doenca')
 
-api.add_resource(Lista_sessoes, '/sessao')
+api.add_resource(Lista_sessoes, '/sessao/<int:id>')
 
 if __name__ == '__main__':
     app.run(debug=True)

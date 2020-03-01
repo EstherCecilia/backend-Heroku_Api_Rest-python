@@ -1,5 +1,5 @@
 # -*- coding: cp1252 -*-
-from models import Sintomas
+from models import *
 
 
 def insere():
@@ -8,8 +8,8 @@ def insere():
     sintoma.save()
 
 def consulta():
-    sintoma = Sintomas.query.all()
-    print(sintoma)
+    doenca = Doencas.query.all()
+    print(doenca)
 
 
 def altera():
