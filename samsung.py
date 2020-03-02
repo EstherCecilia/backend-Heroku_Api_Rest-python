@@ -231,13 +231,6 @@ class Lista_sessoes(Resource):
         }
         return response
 
-class Inicio(Resource):
-    text = "Sintomas : /sintomas, Prevenções: /prevencao, Doenças : /doenca, Salas: /sala, Sessão: /sessao"
-    return text
-
-        
- 
-api.add_resource(Inicio, '/')
 
 api.add_resource(Sintoma, '/sintoma/<string:nome>')
 api.add_resource(Lista_sintomas, '/sintoma')
