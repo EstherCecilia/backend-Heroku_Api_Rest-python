@@ -19,6 +19,29 @@ conected = Table('conected',Base.metadata,
                Column('id_prevencao', Integer, ForeignKey('prevencoes.id'))
     )
 
+
+conecteds = Table('conecteds',Base.metadata, 
+               Column('id_doenca', Integer, ForeignKey('doencas.id')),
+               Column('id_transmicao', Integer, ForeignKey('transmicaos.id'))
+    )
+
+class Transmicaos(Base):
+    __tablename__='transmicaos'
+    id = Column(Integer, primary_key=True)
+    nome = Column(String(80))
+
+    def __repr__(self):
+        return '"{}"'.format(self.nome)
+
+    def save(self):
+        db_session.add(self)
+        db_session.commit()
+
+    def delete(self):
+        db_session.delete(self)
+        db_session.commit()
+        
+
 class Sintomas(Base):
     __tablename__='sintomas'
     id = Column(Integer, primary_key=True)
@@ -61,6 +84,7 @@ class Doencas(Base):
     nome = Column(String(40), index=True)
     sintomas = relationship('Sintomas', secondary=conect, backref=backref('conects', lazy='dynamic'))
     prevencao = relationship("Prevencoes", secondary=conected, backref=backref('conecteds', lazy='dynamic'))
+    transmicao = relationship("Transmicaos", secondary=conecteds, backref=backref('conectedses', lazy='dynamic'))
     tipo = Column(String(40))
     agente = Column(String(40))
 

@@ -63,6 +63,59 @@ class Lista_sintomas(Resource):
 
         return response
 
+class Transmicao(Resource):
+    def get(self, nome):
+        transmicao = Transmicaos.query.filter_by(nome=nome).first()
+        try:
+            response = {
+                'nome' : transmicao.nome,
+                'id' : transmicao.id
+
+                }
+
+        except AttributeError:
+            response = {'status': 'Error', 'mensagem':'Nome não encontrado'}
+            
+        return response
+    def put(self, nome):
+        transmicao = Transmicaos.query.filter_by(nome=nome).first()
+        dados = request.json
+        if 'nome' in dados:
+            transmicao.nome = dados['nome']
+
+        transmicao.save()
+
+        response = {
+            'id' : transmicao.id,
+            'nome' : transmicao.nome
+            }
+
+        return response
+    
+    def delete(self, nome):
+        transmicao = Transmicaos.query.filter_by(nome=nome).first()
+        transmicao.delete()
+
+        return {'status': 'sucesso', 'mensagem': 'Registro excluido'}
+
+
+class Lista_transmicaos(Resource):
+    def get(self):
+        transmicao = Transmicaos.query.all()
+        response = [{'id':i.id, 'nome':i.nome} for i in transmicao]
+        return response
+    
+    def post(self):
+        dados = request.json
+        transmicao = Transmicaos(nome=dados['nome'])
+        transmicao.save()
+        response = {
+            'id' : transmicao.id,
+            'nome' : transmicao.nome
+            }
+
+        return response
+
 
 class Prevencao(Resource):
     def get(self, nome):
@@ -184,56 +237,106 @@ class Lista_salas(Resource):
 
 
 
+class Doenca(Resource):
+    def get(self, nome):
+        doenca = Doencas.query.filter_by(nome=nome).first()
+        try:
+            response = {
+                'nome' : doenca.nome,
+                'tipo' : doenca.tipo,
+                'agente' : doenca.agente,
+                'id' : doenca.id
+
+                }
+
+        except AttributeError:
+            response = {'status': 'Error', 'mensagem':'Nome não encontrado'}
+            
+        return response
+    
+    def put(self, nome):
+        doenca = Doencas.query.filter_by(nome=nome).first()
+        dados = request.json
+        if 'nome' in dados:
+            doenca.nome = dados['nome']
+            
+        doenca.save()
+
+        response = {
+                'nome' : doenca.nome,
+                'tipo' : doenca.tipo,
+                'agente' : doenca.agente,
+                'id' : doenca.id
+
+                }
+
+        return response
+    
+    def delete(self, nome):
+        doenca = Doencas.query.filter_by(nome=nome).first()
+        doenca.delete()
+
+        return {'status': 'sucesso', 'mensagem': 'Registro excluido'}
+
 
 
 class Lista_doencas(Resource):
     def get(self):
         doencas = Doencas.query.all()
-        response = [{'id':i.id, 'nome':i.nome, 'tipo':i.tipo, 'agente':i.agente, 'sintomas':[{'nome':s.nome} for s in i.sintomas], 'prevencao':[{'nome':s.nome} for s in i.prevencao]} for i in doencas]
+        response = [{'id':i.id, 'nome':i.nome, 'tipo':i.tipo, 'agente':i.agente, 'sintomas':[{'nome':s.nome} for s in i.sintomas], 'transmicao':[{'nome':s.nome} for s in i.transmicao], 'prevencao':[{'nome':s.nome} for s in i.prevencao]} for i in doencas]
         return response
     
 
     def post(self):
         dados = request.json
-        sintoma = Sintomas.query.filter_by(nome=dados['sintoma']).first()
+        print(dados['sintoma'])
+        #sintoma = Sintomas.query.filter_by(nome=dados['sintoma']).first()
+        #print(sintoma)
         prevencao = Prevencoes.query.filter_by(nome=dados['prevencao']).first()
-        doenca = Doencas(nome=dados['nome'], agente=dados['agente'], tipo=dados['tipo'], sintomas=sintoma, prevencao=prevencao)
+        doenca = Doencas(nome=dados['nome'], agente=dados['agente'], tipo=dados['tipo'])
         doenca.save()
         return "Doença inserida com sucesso!"
         
 
 
 class Lista_sessoes(Resource):
-    def get(self, id):
-        doenca = Doencas.query.all()
-        #limitar doencas
-        sala = Salas.query.all()
-        responSala = {'id':sala[id].id, 'nome':sala[id].nome, 'senha':sala[id].senha}
-        responDoenca = [{'id':i.id, 'nome':i.nome, 'tipo':i.tipo, 'agente':i.agente,'sintomas':[{'nome':s.nome} for s in i.sintomas], 'prevencao':[{'nome':s.nome} for s in i.prevencao] } for i in doenca]
+    def get(self):
+        doencas = Doencas.query.all()
+        dados = request.json
+        
+        #aux = random.shuffle(doenca)
+        doenca = doencas[:dados['doencas']]
 
+        
+        salaCheck = Salas.query.filter_by(nome=dados['nome']).first()
+        
+        responSala = {'id':salaCheck.id, 'nome':salaCheck.nome, 'senha':salaCheck.senha}
+        responDoenca = [{'id':i.id, 'nome':i.nome, 'tipo':i.tipo, 'agente':i.agente,'sintomas':[{'nome':s.nome} for s in i.sintomas], 'transmicao':[{'nome':s.nome} for s in i.transmicao], 'prevencao':[{'nome':s.nome} for s in i.prevencao] } for i in doenca]
         items = randrange(1000, 99999)
 
-        response = {'id':items,'sala':responSala,'doencas':responDoenca}
+        if salaCheck.publica == True:
+            response = {'status':True, 'id':items,'sala':responSala,'doencas':responDoenca}
+
+        if salaCheck.publica == False:
+            if salaCheck.senha == dados['senha']:
+                response = {'status':True, 'id':items,'sala':responSala,'doencas':responDoenca}
+            else:
+                response = {'status':False}                
         return response
     
 
-    def post(self):
-        dados = request.json
-        sala = Salas.query.filter_by(nome=dados['sala']).first()
-        doenca = Doencas.query.filter_by(nome=dados['doenca']).first()
-        sessao = Sessoes(nome=dados['nome'], doenca=doenca, sala=sala)
-        sessao.save()
-        response = {
-            'nome' : sessao.nome,
-            'sala': sessao.sala.nome,
-            'doenca': sessao.doenca.nome,
-            'id':sessao.id
-        }
-        return response
+class Home(Resource):
+    def get(self):
+        return "Bem vindo, Adiciona um endpoint para melhor navegar na api"
+    
 
+api.add_resource(Home, '/')
 
 api.add_resource(Sintoma, '/sintoma/<string:nome>')
 api.add_resource(Lista_sintomas, '/sintoma')
+
+api.add_resource(Transmicao, '/transmicao/<string:nome>')
+api.add_resource(Lista_transmicaos, '/transmicao')
 
 api.add_resource(Prevencao, '/prevencao/<string:nome>')
 api.add_resource(Lista_prevencoes, '/prevencao')
@@ -241,9 +344,10 @@ api.add_resource(Lista_prevencoes, '/prevencao')
 api.add_resource(Sala, '/sala/<string:nome>')
 api.add_resource(Lista_salas, '/sala')
 
+api.add_resource(Doenca, '/doenca/<string:nome>')
 api.add_resource(Lista_doencas, '/doenca')
 
-api.add_resource(Lista_sessoes, '/sessao/<int:id>')
+api.add_resource(Lista_sessoes, '/sessao')
 
 if __name__ == '__main__':
     app.run(debug=True)
