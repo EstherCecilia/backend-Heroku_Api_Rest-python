@@ -235,6 +235,25 @@ class Lista_salas(Resource):
 
         return response
 
+class Lista_jogador(Resource):
+    def get(self):
+        jogador = Ranking.query.all()
+        response = [{'nome':i.nome, 'pontuacao':i.pontuacao} for i in jogador]
+        return response
+    
+    def post(self):
+        dados = request.json
+        jogador = Ranking(id=dados['id'],nome=dados['nome'], tempo=dados['tempo'])
+        jogador.save()
+        response = {
+                'nome' : jogador.nome,
+                'tempo' : jogador.tempo,
+                'id': jogador.id
+
+            }
+
+        return response
+
 
 
 class Doenca(Resource):
@@ -334,6 +353,9 @@ api.add_resource(Home, '/')
 
 api.add_resource(Sintoma, '/sintoma/<string:nome>')
 api.add_resource(Lista_sintomas, '/sintoma')
+
+api.add_resource(Lista_jogador, '/jogador')
+
 
 api.add_resource(Transmicao, '/transmicao/<string:nome>')
 api.add_resource(Lista_transmicaos, '/transmicao')
