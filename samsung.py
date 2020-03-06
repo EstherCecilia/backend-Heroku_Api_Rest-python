@@ -235,25 +235,6 @@ class Lista_salas(Resource):
 
         return response
 
-class Lista_jogador(Resource):
-    def get(self):
-        jogador = Ranking.query.all()
-        response = [{'nome':i.nome, 'pontuacao':i.pontuacao} for i in jogador]
-        return response
-    
-    def post(self):
-        dados = request.json
-        jogador = Ranking(id=dados['id'],nome=dados['nome'], tempo=dados['tempo'])
-        jogador.save()
-        response = {
-                'nome' : jogador.nome,
-                'tempo' : jogador.tempo,
-                'id': jogador.id
-
-            }
-
-        return response
-
 
 
 class Doenca(Resource):
@@ -322,11 +303,9 @@ class Lista_sessoes(Resource):
     def get(self):
         doencas = Doencas.query.all()
         dados = request.json
-        
-        #aux = random.shuffle(doenca)
+        shuffle(doencas)
         doenca = doencas[:dados['doencas']]
 
-        
         salaCheck = Salas.query.filter_by(nome=dados['nome']).first()
         
         responSala = {'id':salaCheck.id, 'nome':salaCheck.nome, 'senha':salaCheck.senha}
@@ -342,7 +321,28 @@ class Lista_sessoes(Resource):
             else:
                 response = {'status':False}                
         return response
+
+class Lista_jogadores(Resource):
+    def get(self):
+        jogador = Ranking.query.all()
+        response = [{'nome':i.nome, 'publica':i.pontuacao} for i in jogador]
+        return response
     
+    def post(self):
+        dados = request.json
+        jogador = Ranking(nome=dados['nome'], tempo=dados['tempo'], id_sessao=dados['id_sessao'])
+        jogador.save()
+        response = {
+                'nome' : jogador.nome,
+                'tempo' : jogador.tempo,
+                'id_sessao' : jogador.id_sessao,
+                'id' : jogador.id,
+                
+
+            }
+
+        return response
+
 
 class Home(Resource):
     def get(self):
@@ -351,11 +351,10 @@ class Home(Resource):
 
 api.add_resource(Home, '/')
 
+api.add_resource(Lista_jogadores, '/jogador')
+
 api.add_resource(Sintoma, '/sintoma/<string:nome>')
 api.add_resource(Lista_sintomas, '/sintoma')
-
-api.add_resource(Lista_jogador, '/jogador')
-
 
 api.add_resource(Transmicao, '/transmicao/<string:nome>')
 api.add_resource(Lista_transmicaos, '/transmicao')
