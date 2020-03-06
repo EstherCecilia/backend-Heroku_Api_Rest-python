@@ -325,7 +325,7 @@ class Lista_sessoes(Resource):
 class Lista_jogadores(Resource):
     def get(self):
         jogador = Ranking.query.all()
-        response = [{'nome':i.nome, 'publica':i.pontuacao} for i in jogador]
+        response = [{'nome':i.nome, 'pontuacao':i.pontuacao} for i in jogador]
         return response
     
     def post(self):
