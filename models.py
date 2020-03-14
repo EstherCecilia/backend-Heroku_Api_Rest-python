@@ -135,6 +135,9 @@ class Ranking(Base):
     def __repr__(self):
         return '<Ranking: {}>'.format(self.nome)
 
+    def get_pontuacao(self):
+        return self.pontuacao
+
     def save(self):
         db_session.add(self)
         db_session.commit()
@@ -145,11 +148,10 @@ class Ranking(Base):
 
 
 
+
 def init_db():
     Base.metadata.create_all(bind=engine)
 
 if __name__ == '__main__':
 
     init_db()
-
-
