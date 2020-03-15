@@ -351,7 +351,8 @@ class Lista_jogadores(Resource):
         
         pontuac = Ranking.query.filter_by(nome=dados['nome']).first()
 
-        pont = ((1/dados['tempo'])*(1/(qtn+1)))*100
+        pont = ((1/dados['tempo'])*(1/(qtn+2)))*100
+        print(qtn)
         
         try:
             ponti = ((1/dados['tempo'])*(1/(pontuac.id)))*100
