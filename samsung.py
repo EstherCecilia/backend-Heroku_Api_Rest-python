@@ -333,8 +333,6 @@ class Jogador(Resource):
 
 
 
-
-
 class Lista_jogadores(Resource):
     def get(self):
         dados = request.json
@@ -391,15 +389,25 @@ class Lista_jogadores(Resource):
         return response
 
 
+class Encerra_jogadores(Resource):
+    def get(self):
+        Ranking.finaliza()
+        return "Sessão encerrada"
+
+
+
 class Home(Resource):
     def get(self):
         return "Bem vindo, Adiciona um endpoint para melhor navegar na api"
+
+
     
 
 api.add_resource(Home, '/')
 
 api.add_resource(Jogador, '/jogador/<string:nome>')
 api.add_resource(Lista_jogadores, '/jogador')
+api.add_resource(Encerra_jogadores, '/jogador/encerra')
 
 api.add_resource(Sintoma, '/sintoma/<string:nome>')
 api.add_resource(Lista_sintomas, '/sintoma')

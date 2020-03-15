@@ -138,6 +138,11 @@ class Ranking(Base):
     def get_pontuacao(self):
         return self.pontuacao
 
+    def finaliza():
+        Ranking.__table__.drop(engine)
+        Ranking.__table__.create(engine)
+
+
     def save(self):
         db_session.add(self)
         db_session.commit()
