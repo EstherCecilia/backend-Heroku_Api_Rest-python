@@ -349,7 +349,8 @@ class Lista_jogadores(Resource):
         
         pontuac = Ranking.query.filter_by(nome=dados['nome']).first()
 
-        
+        pont = ((1/dados['tempo'])*(1/(qtn+2)))*100
+        print(qtn)
         
         try:
             ponti = ((1/dados['tempo'])*(1/(pontuac.id)))*100
@@ -368,12 +369,13 @@ class Lista_jogadores(Resource):
             }
 
         except AttributeError:
-            ponto = 0
-            jogador = Ranking(nome=dados['nome'], id_sessao=dados['id_sessao'], pontuacao=ponto)
+            ponto = pont
+            jogador = Ranking(nome=dados['nome'], tempo=dados['tempo'], id_sessao=dados['id_sessao'], pontuacao=ponto)
             jogador.save()
 
             response = {
                 'nome' : jogador.nome,
+                'tempo' : jogador.tempo,
                 'id_sessao' : jogador.id_sessao,
                 'id' : jogador.id,
                 'pontuacao': jogador.pontuacao
