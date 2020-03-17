@@ -345,15 +345,14 @@ class Lista_jogadores(Resource):
     
     def post(self):
         dados = request.json
-        qtn = len(Ranking.query.all())
-        
         pontuac = Ranking.query.filter_by(nome=dados['nome']).first()
 
-        pont = ((1/dados['tempo'])*(1/(qtn+2)))*100
-        print(qtn)
         
         try:
-            ponti = ((1/dados['tempo'])*(1/(pontuac.id)))*100
+            if 'tempo' in dados:
+                ponti = ((1/dados['tempo'])*(1/(pontuac.ordem)))*100
+            else:
+                ponti = 0
             ponto = pontuac.pontuacao + ponti
             pontuac.pontuacao = ponto
             pontuac.save()
@@ -362,6 +361,7 @@ class Lista_jogadores(Resource):
                 'nome' : pontuac.nome,
                 'tempo' : pontuac.tempo,
                 'id_sessao' : pontuac.id_sessao,
+                'ordem': pontuac.ordem,
                 'id' : pontuac.id,
                 'pontuacao': pontuac.pontuacao
                 
@@ -369,13 +369,14 @@ class Lista_jogadores(Resource):
             }
 
         except AttributeError:
-            ponto = pont
-            jogador = Ranking(nome=dados['nome'], tempo=dados['tempo'], id_sessao=dados['id_sessao'], pontuacao=ponto)
+            ponto = 0
+            temp = 0
+            ordem = len(Ranking.query.filter_by(id_sessao=dados['id_sessao']).all()) + 1
+            jogador = Ranking(nome=dados['nome'], tempo=temp, id_sessao=dados['id_sessao'], pontuacao=ponto, ordem=ordem)
             jogador.save()
 
             response = {
                 'nome' : jogador.nome,
-                'tempo' : jogador.tempo,
                 'id_sessao' : jogador.id_sessao,
                 'id' : jogador.id,
                 'pontuacao': jogador.pontuacao

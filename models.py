@@ -125,6 +125,7 @@ class Salas(Base):
 class Ranking(Base):
     __tablename__='ranking'
     id = Column(Integer, primary_key=True)
+    ordem = Column(Integer())
     id_sessao = Column(Integer())
     nome = Column(String(40))
     tempo = Column(Float())
