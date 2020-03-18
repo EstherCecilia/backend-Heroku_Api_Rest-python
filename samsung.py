@@ -338,17 +338,22 @@ class Lista_jogadores(Resource):
         dados = request.json
         jogador = Ranking.query.filter_by(id_sessao=dados['id_sessao']).all()
         
-        jogador_ordenado = sorted(jogador, key = Ranking.get_pontuacao)
+        jogador_ordenado = sorted(jogador, key = Ranking.get_pontuacao, reverse=True)
 
         response = [{'nome':i.nome, 'pontuacao':i.pontuacao} for i in jogador_ordenado]
         return response
     
     def post(self):
         dados = request.json
-        pontuac = Ranking.query.filter_by(nome=dados['nome']).first()
+        pontuac = Ranking.query.filter_by(nome=dados['nome']).filter_by(id_sessao=dados['id_sessao']).first()
 
         
         try:
+            if 'pergunta' in dados:
+                pergunta = len(Ranking.query.filter_by(perguntadas=dados['pergunta']).all())
+                print(pergunta)
+                pontuac.perguntadas = dados['pergunta']
+                pontuac.ordem = pergunta + 1
             if 'tempo' in dados:
                 ponti = ((1/dados['tempo'])*(1/(pontuac.ordem)))*100
             else:
@@ -359,7 +364,6 @@ class Lista_jogadores(Resource):
 
             response = {
                 'nome' : pontuac.nome,
-                'tempo' : pontuac.tempo,
                 'id_sessao' : pontuac.id_sessao,
                 'ordem': pontuac.ordem,
                 'id' : pontuac.id,
@@ -371,8 +375,9 @@ class Lista_jogadores(Resource):
         except AttributeError:
             ponto = 0
             temp = 0
+            pergunta = 0
             ordem = len(Ranking.query.filter_by(id_sessao=dados['id_sessao']).all()) + 1
-            jogador = Ranking(nome=dados['nome'], tempo=temp, id_sessao=dados['id_sessao'], pontuacao=ponto, ordem=ordem)
+            jogador = Ranking(nome=dados['nome'], tempo=temp, perguntadas = pergunta, id_sessao=dados['id_sessao'], pontuacao=ponto, ordem=ordem)
             jogador.save()
 
             response = {

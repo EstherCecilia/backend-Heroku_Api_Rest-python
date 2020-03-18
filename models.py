@@ -130,6 +130,7 @@ class Ranking(Base):
     nome = Column(String(40))
     tempo = Column(Float())
     pontuacao = Column(Float())
+    perguntadas = Column(Integer())
     
 
 
