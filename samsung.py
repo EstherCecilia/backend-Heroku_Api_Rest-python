@@ -350,7 +350,7 @@ class Lista_jogadores(Resource):
 
 
         try:
-            pergunta = len(Ranking.query.filter_by(perguntadas=dados['pergunta']).all())
+            pergunta = len(Ranking.query.filter_by(id_sessao=dados['id_sessao']).filter_by(perguntadas=dados['pergunta']).all())
             pontuac.perguntadas = dados['pergunta']
             pontuac.ordem = pergunta + 1
             ponti = ((1/dados['tempo'])*(1/(pontuac.ordem)))*100
