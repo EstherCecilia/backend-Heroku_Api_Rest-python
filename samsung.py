@@ -286,9 +286,6 @@ class Lista_doencas(Resource):
 
     def post(self):
         dados = request.json
-        print(dados['sintoma'])
-        #sintoma = Sintomas.query.filter_by(nome=dados['sintoma']).first()
-        #print(sintoma)
         prevencao = Prevencoes.query.filter_by(nome=dados['prevencao']).first()
         doenca = Doencas(nome=dados['nome'], agente=dados['agente'], tipo=dados['tipo'])
         doenca.save()
@@ -308,9 +305,11 @@ class Lista_sessoes(Resource):
         responSala = {'id':salaCheck.id, 'nome':salaCheck.nome, 'senha':salaCheck.senha}
         responDoenca = [{'id':i.id, 'nome':i.nome, 'tipo':i.tipo, 'agente':i.agente,'sintomas':[{'nome':s.nome} for s in i.sintomas], 'transmicao':[{'nome':s.nome} for s in i.transmicao], 'prevencao':[{'nome':s.nome} for s in i.prevencao] } for i in doenca]
         items = randrange(1000, 99999)
+        item = randrange(1000, 99999)
+        id = items + item - salaCheck.id
 
         if salaCheck.senha == dados['senha']:
-                response = {'status':True, 'id':items,'sala':responSala,'doencas':responDoenca}
+                response = {'status':True, 'id':id,'sala':responSala,'doencas':responDoenca}
         else:
                 response = {'status':False}                
         return response
@@ -347,6 +346,7 @@ class Lista_jogadores(Resource):
     def put(self):
         dados = request.json
         pontuac = Ranking.query.filter_by(nome=dados['nome']).filter_by(id_sessao=dados['id_sessao']).filter_by(adivinhador=True).first()
+        adivinhador =Ranking.query.filter_by(id_sessao=dados['id_sessao']).filter_by(adivinhador=False).first()
 
 
         
@@ -360,8 +360,7 @@ class Lista_jogadores(Resource):
             pontuac.save()
 
 
-            adivinhador =Ranking.query.filter_by(id_sessao=dados['id_sessao']).filter_by(adivinhador=False).first()
-            adivinhador.pontuacao = ponti*0.5
+            adivinhador.pontuacao = ponti*0.75
             adivinhador.save()
 
             response = {
@@ -386,11 +385,10 @@ class Lista_jogadores(Resource):
         x = len(Ranking.query.filter_by(perguntadas=dados['pergunta']).filter_by(id_sessao=dados['id_sessao']).all())
         y = len(Ranking.query.filter_by(id_sessao=dados['id_sessao']).all()) - 1
         if y == x:
-            jogadorNovo = Ranking.query.filter_by(id_sessao=dados['id_sessao']).filter_by(adivinhador=False).first()
-            jogadorNovo.adivinhador = True
-            jogadorNovo.save()
-            jogadorNovo.ordem = 300
-            jogadorNovo.save()
+            adivinhador.adivinhador = True
+            adivinhador.save()
+            adivinhador.ordem = 300
+            adivinhador.save()
             jogadorVelho = Ranking.query.filter_by(id_sessao=dados['id_sessao']).filter_by(ordem=1).first()
             jogadorVelho.adivinhador = False
             jogadorVelho.save()
