@@ -106,7 +106,6 @@ class Salas(Base):
     id = Column(Integer, primary_key=True)
     nome = Column(String(40))
     senha = Column(String(40))
-    publica = Column(Boolean)
     
 
 
@@ -128,7 +127,7 @@ class Ranking(Base):
     ordem = Column(Integer())
     id_sessao = Column(Integer())
     nome = Column(String(40))
-    tempo = Column(Float())
+    adivinhador = Column(Boolean())
     pontuacao = Column(Float())
     perguntadas = Column(Integer())
     

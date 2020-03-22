@@ -177,7 +177,6 @@ class Sala(Resource):
             response = {
                 'nome' : sala.nome,
                 'senha' : sala.senha,
-                'publica' : sala.publica,
                 'id' : sala.id
 
                 }
@@ -201,7 +200,6 @@ class Sala(Resource):
         response = {
                 'nome' : sala.nome,
                 'senha' : sala.senha,
-                'publica' : sala.publica,
                 'id' : sala.id
 
                 }
@@ -218,17 +216,16 @@ class Sala(Resource):
 class Lista_salas(Resource):
     def get(self):
         sala = Salas.query.all()
-        response = [{'id':i.id, 'nome':i.nome, 'publica':i.publica, 'senha':i.senha} for i in sala]
+        response = [{'id':i.id, 'nome':i.nome, 'senha':i.senha} for i in sala]
         return response
     
     def post(self):
         dados = request.json
-        sala = Salas(nome=dados['nome'], senha=dados['senha'], publica=dados['publica'])
+        sala = Salas(nome=dados['nome'], senha=dados['senha'])
         sala.save()
         response = {
                 'nome' : sala.nome,
                 'senha' : sala.senha,
-                'publica' : sala.publica,
                 'id' : sala.id
 
             }
@@ -312,13 +309,9 @@ class Lista_sessoes(Resource):
         responDoenca = [{'id':i.id, 'nome':i.nome, 'tipo':i.tipo, 'agente':i.agente,'sintomas':[{'nome':s.nome} for s in i.sintomas], 'transmicao':[{'nome':s.nome} for s in i.transmicao], 'prevencao':[{'nome':s.nome} for s in i.prevencao] } for i in doenca]
         items = randrange(1000, 99999)
 
-        if salaCheck.publica == True:
-            response = {'status':True, 'id':items,'sala':responSala,'doencas':responDoenca}
-
-        if salaCheck.publica == False:
-            if salaCheck.senha == dados['senha']:
+        if salaCheck.senha == dados['senha']:
                 response = {'status':True, 'id':items,'sala':responSala,'doencas':responDoenca}
-            else:
+        else:
                 response = {'status':False}                
         return response
 
@@ -336,27 +329,40 @@ class Jogador(Resource):
 class Lista_jogadores(Resource):
     def get(self):
         dados = request.json
-        jogador = Ranking.query.filter_by(id_sessao=dados['id_sessao']).all()
+        jogador = Ranking.query.filter_by(id_sessao=dados['id_sessao']).filter_by(adivinhador=True).all()
         
         jogador_ordenado = sorted(jogador, key = Ranking.get_pontuacao, reverse=True)
+        
 
-        response = [{'nome':i.nome, 'pontuacao':i.pontuacao} for i in jogador_ordenado]
+        responseAdivinhador = [{'nome':i.nome, 'pontuacao':i.pontuacao} for i in jogador_ordenado]
+
+        jogadorDica = Ranking.query.filter_by(id_sessao=dados['id_sessao']).filter_by(adivinhador=False).first()
+
+        responseDicas = {'nome':jogadorDica.nome, 'pontuacao':jogadorDica.pontuacao}
+
+        response = {'dica':responseDicas, 'adivinhador':responseAdivinhador}
         return response
 
 
     def put(self):
         dados = request.json
-        pontuac = Ranking.query.filter_by(nome=dados['nome']).filter_by(id_sessao=dados['id_sessao']).first()
+        pontuac = Ranking.query.filter_by(nome=dados['nome']).filter_by(id_sessao=dados['id_sessao']).filter_by(adivinhador=True).first()
 
 
+        
         try:
             pergunta = len(Ranking.query.filter_by(id_sessao=dados['id_sessao']).filter_by(perguntadas=dados['pergunta']).all())
             pontuac.perguntadas = dados['pergunta']
             pontuac.ordem = pergunta + 1
-            ponti = ((1/dados['tempo'])*(1/(pontuac.ordem)))*100
+            ponti = (1/(pontuac.ordem))*10
             ponto = pontuac.pontuacao + ponti
             pontuac.pontuacao = ponto
             pontuac.save()
+
+
+            adivinhador =Ranking.query.filter_by(id_sessao=dados['id_sessao']).filter_by(adivinhador=False).first()
+            adivinhador.pontuacao = ponti*0.5
+            adivinhador.save()
 
             response = {
                 'status':True,
@@ -369,11 +375,25 @@ class Lista_jogadores(Resource):
 
             }
 
+            
+
         except AttributeError:
             response = {
                 'status':False
 
             }
+
+        x = len(Ranking.query.filter_by(perguntadas=dados['pergunta']).filter_by(id_sessao=dados['id_sessao']).all())
+        y = len(Ranking.query.filter_by(id_sessao=dados['id_sessao']).all()) - 1
+        if y == x:
+            jogadorNovo = Ranking.query.filter_by(id_sessao=dados['id_sessao']).filter_by(adivinhador=False).first()
+            jogadorNovo.adivinhador = True
+            jogadorNovo.save()
+            jogadorNovo.ordem = 300
+            jogadorNovo.save()
+            jogadorVelho = Ranking.query.filter_by(id_sessao=dados['id_sessao']).filter_by(ordem=1).first()
+            jogadorVelho.adivinhador = False
+            jogadorVelho.save()
 
         
         
@@ -383,7 +403,7 @@ class Lista_jogadores(Resource):
         
     def post(self):
         dados = request.json
-        pontuac = Ranking.query.filter_by(nome=dados['nome']).filter_by(id_sessao=dados['id_sessao']).first()
+        pontuac = Ranking.query.filter_by(id_sessao=dados['id_sessao']).filter_by(nome=dados['nome']).first()
 
         
         try:
@@ -396,10 +416,13 @@ class Lista_jogadores(Resource):
 
         except AttributeError:
             ponto = 0
-            temp = 0
             pergunta = 0
             ordem = len(Ranking.query.filter_by(id_sessao=dados['id_sessao']).all()) + 1
-            jogador = Ranking(nome=dados['nome'], tempo=temp, perguntadas = pergunta, id_sessao=dados['id_sessao'], pontuacao=ponto, ordem=ordem)
+            if ordem == 1 :
+                adivinhador = False
+            else:
+                adivinhador = True
+            jogador = Ranking(nome=dados['nome'],  perguntadas = pergunta, id_sessao=dados['id_sessao'], pontuacao=ponto, ordem=ordem, adivinhador=adivinhador)
             jogador.save()
 
             response = {
@@ -407,7 +430,8 @@ class Lista_jogadores(Resource):
                 'nome' : jogador.nome,
                 'id_sessao' : jogador.id_sessao,
                 'id' : jogador.id,
-                'pontuacao': jogador.pontuacao
+                'pontuacao': jogador.pontuacao,
+                'adivinhador': jogador.adivinhador
                 
 
             }
