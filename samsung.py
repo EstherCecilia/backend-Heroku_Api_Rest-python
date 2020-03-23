@@ -339,7 +339,7 @@ class Lista_jogadores(Resource):
 
         responseDicas = {'nome':jogadorDica.nome, 'pontuacao':jogadorDica.pontuacao}
 
-        response = {'dica':responseDicas, 'adivinhador':responseAdivinhador}
+        response = {'darDica':responseDicas, 'adivinhador':responseAdivinhador}
         return response
 
 
@@ -351,9 +351,9 @@ class Lista_jogadores(Resource):
 
         
         try:
-            pergunta = len(Ranking.query.filter_by(id_sessao=dados['id_sessao']).filter_by(perguntadas=dados['pergunta']).all())
-            pontuac.perguntadas = dados['pergunta']
-            pontuac.ordem = pergunta + 1
+            rodada = len(Ranking.query.filter_by(id_sessao=dados['id_sessao']).filter_by(rodada=dados['rodada']).all())
+            pontuac.rodada = dados['rodada']
+            pontuac.ordem = rodada + 1
             ponti = (1/(pontuac.ordem))*10
             ponto = pontuac.pontuacao + ponti
             pontuac.pontuacao = ponto
@@ -382,7 +382,7 @@ class Lista_jogadores(Resource):
 
             }
 
-        x = len(Ranking.query.filter_by(perguntadas=dados['pergunta']).filter_by(id_sessao=dados['id_sessao']).all())
+        x = len(Ranking.query.filter_by(rodada=dados['rodada']).filter_by(id_sessao=dados['id_sessao']).all())
         y = len(Ranking.query.filter_by(id_sessao=dados['id_sessao']).all()) - 1
         if y == x:
             adivinhador.adivinhador = True
@@ -414,13 +414,13 @@ class Lista_jogadores(Resource):
 
         except AttributeError:
             ponto = 0
-            pergunta = 0
+            rodada = 0
             ordem = len(Ranking.query.filter_by(id_sessao=dados['id_sessao']).all()) + 1
             if ordem == 1 :
                 adivinhador = False
             else:
                 adivinhador = True
-            jogador = Ranking(nome=dados['nome'],  perguntadas = pergunta, id_sessao=dados['id_sessao'], pontuacao=ponto, ordem=ordem, adivinhador=adivinhador)
+            jogador = Ranking(nome=dados['nome'],  rodada = rodada, id_sessao=dados['id_sessao'], pontuacao=ponto, ordem=ordem, adivinhador=adivinhador)
             jogador.save()
 
             response = {

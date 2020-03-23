@@ -129,7 +129,7 @@ class Ranking(Base):
     nome = Column(String(40))
     adivinhador = Column(Boolean())
     pontuacao = Column(Float())
-    perguntadas = Column(Integer())
+    rodada = Column(Integer())
     
 
 
