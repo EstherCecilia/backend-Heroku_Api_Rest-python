@@ -235,6 +235,7 @@ class Lista_salas(Resource):
             sala = Salas(nome=dados['nome'], senha=dados['senha'])
             sala.save()
             response = {
+                    'status':True,
                     'nome' : sala.nome,
                     'senha' : sala.senha,
                     'id' : sala.id
