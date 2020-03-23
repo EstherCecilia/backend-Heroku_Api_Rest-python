@@ -221,14 +221,25 @@ class Lista_salas(Resource):
     
     def post(self):
         dados = request.json
-        sala = Salas(nome=dados['nome'], senha=dados['senha'])
-        sala.save()
-        response = {
-                'nome' : sala.nome,
-                'senha' : sala.senha,
-                'id' : sala.id
+        salaCheck = Salas.query.filter_by(nome=dados['nome']).first()
+        
+        try:
+            salaCheck.nome = dados['nome']
+            response = {
+                'status':False
+                
 
             }
+
+        except AttributeError:
+            sala = Salas(nome=dados['nome'], senha=dados['senha'])
+            sala.save()
+            response = {
+                    'nome' : sala.nome,
+                    'senha' : sala.senha,
+                    'id' : sala.id
+
+                }
 
         return response
 
