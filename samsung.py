@@ -21,7 +21,7 @@ class Sintoma(Resource):
                 }
 
         except AttributeError:
-            response = {'status': 'Error', 'mensagem':'Nome não encontrado'}
+            response = {'status': False}
             
         return response
     def put(self, nome):
@@ -74,7 +74,7 @@ class Transmicao(Resource):
                 }
 
         except AttributeError:
-            response = {'status': 'Error', 'mensagem':'Nome não encontrado'}
+            response = {'status': False}
             
         return response
     def put(self, nome):
@@ -128,7 +128,7 @@ class Prevencao(Resource):
                 }
 
         except AttributeError:
-            response = {'status': 'Error', 'mensagem':'Nome não encontrado'}
+            response = {'status': False}
             
         return response
     def put(self, nome):
@@ -182,7 +182,7 @@ class Sala(Resource):
                 }
 
         except AttributeError:
-            response = {'status': 'Error', 'mensagem':'Nome não encontrado'}
+            response = {'status': False}
             
         return response
     
