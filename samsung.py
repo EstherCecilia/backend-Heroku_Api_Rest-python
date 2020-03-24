@@ -175,7 +175,7 @@ class Sala(Resource):
         sala = Salas.query.filter_by(nome=nome).first()
         try:
             response = {
-                'status': True
+                'status': True,
                 'nome' : sala.nome,
                 'senha' : sala.senha,
                 'id' : sala.id
