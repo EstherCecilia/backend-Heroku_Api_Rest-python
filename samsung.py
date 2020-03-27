@@ -312,37 +312,38 @@ class Lista_sessoes(Resource):
     def post(self):
         dados = request.json
         sessao = Sessao.query.all()
-        now = datetime.now()
-        current_time = now.strftime("%H")
         today = date.today()
 
 
 
         salaCheck = Salas.query.filter_by(nome=dados['nome']).first()
         responSala = {'nome':salaCheck.nome, 'senha':salaCheck.senha}
-
-        codigo = str(today.day)+str(today.month)+str(today.year)+str(current_time)+str(salaCheck.id)
         
         doenca = Doencas.query.all()
+        shuffle(doenca)
         responDoenca = [{'id':i.id, 'nome':i.nome, 'tipo':i.tipo, 'agente':i.agente,'sintomas':[{'nome':s.nome} for s in i.sintomas], 'transmicao':[{'nome':s.nome} for s in i.transmicao], 'prevencao':[{'nome':s.nome} for s in i.prevencao] } for i in doenca]
 
 
-        sessaoCheck = Sessao.query.filter_by(id_sessao=codigo).first()
-        
+        codigo = str(today.day)+str(today.month)+str(today.year)+str(salaCheck.id)
 
+         
+        check = len(Ranking.query.filter_by(id_sessao=codigo).filter_by(rodada=1).all())
 
-        try:
-            response = {'status':True, 'id':sessaoCheck.id_sessao,'sala':responSala, 'doencas':responDoenca}
+        if check >= 1:
+            response = {'status':"Uma sala já está usando essa sessao"}
             
-        except AttributeError:
+        else:
+            sessaoCheck = Sessao.query.filter_by(id_sessao=codigo).first()
+            try:
+                response = {'status':True, 'id':sessaoCheck.id_sessao,'sala':responSala, 'doencas':responDoenca}
             
-
-            if salaCheck.senha == dados['senha']:
-                sessao = Sessao(id_sessao=codigo)
-                sessao.save()
-                response = {'status':True, 'id':sessao.id_sessao,'sala':responSala, 'doencas':responDoenca}
-            else:
-                response = {'status':False}                
+            except AttributeError:
+                if salaCheck.senha == dados['senha']:
+                    sessao = Sessao(id_sessao=codigo)
+                    sessao.save()
+                    response = {'status':True, 'id':sessao.id_sessao,'sala':responSala, 'doencas':responDoenca}
+                else:
+                    response = {'status':False}                
         return response
 
 
@@ -437,35 +438,42 @@ class Lista_jogadores(Resource):
         pontuac = Ranking.query.filter_by(id_sessao=dados['id_sessao']).filter_by(nome=dados['nome']).first()
 
         
-        try:
-            pontuac.nome = dados['nome']
+        check = len(Ranking.query.filter_by(id_sessao=dados['id_sessao']).filter_by(rodada=1).all())
+
+        if check >= 1:
             response = {
-                'status':False
+                'status':"Sessão já foi iniciada"    
+            }
+        else:
+            try:
+                pontuac.nome = dados['nome']
+                response = {
+                    'status':False
                 
 
-            }
+                }
 
-        except AttributeError:
-            ponto = 0
-            rodada = 0
-            ordem = len(Ranking.query.filter_by(id_sessao=dados['id_sessao']).all()) + 1
-            if ordem == 1 :
-                adivinhador = False
-            else:
-                adivinhador = True
-            jogador = Ranking(nome=dados['nome'],  rodada = rodada, id_sessao=dados['id_sessao'], pontuacao=ponto, ordem=ordem, adivinhador=adivinhador)
-            jogador.save()
+            except AttributeError:
+                ponto = 0
+                rodada = 0
+                ordem = len(Ranking.query.filter_by(id_sessao=dados['id_sessao']).all()) + 1
+                if ordem == 1 :
+                    adivinhador = False
+                else:
+                    adivinhador = True
+                jogador = Ranking(nome=dados['nome'],  rodada = rodada, id_sessao=dados['id_sessao'], pontuacao=ponto, ordem=ordem, adivinhador=adivinhador)
+                jogador.save()
 
-            response = {
-                'status':True,
-                'nome' : jogador.nome,
-                'id_sessao' : jogador.id_sessao,
-                'id' : jogador.id,
-                'pontuacao': jogador.pontuacao,
-                'adivinhador': jogador.adivinhador
+                response = {
+                    'status':True,
+                    'nome' : jogador.nome,
+                    'id_sessao' : jogador.id_sessao,
+                    'id' : jogador.id,
+                    'pontuacao': jogador.pontuacao,
+                    'adivinhador': jogador.adivinhador
                 
 
-            }
+                }
 
         
         
