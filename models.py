@@ -154,34 +154,6 @@ class Ranking(Base):
         db_session.commit()
 
 
-class Sessao(Base):
-    __tablename__='sessao'
-    id = Column(Integer, primary_key=True)
-    id_sessao = Column(String(40))
-
-
-    
-
-
-    def __repr__(self):
-        return '<Sessao: {}>'
-
-
-    def finaliza():
-        Sessao.__table__.drop(engine)
-        Sessao.__table__.create(engine)
-
-
-    def save(self):
-        db_session.add(self)
-        db_session.commit()
-
-    def delete(self):
-        db_session.delete(self)
-        db_session.commit()
-
-
-
 
 
 def init_db():

@@ -309,47 +309,49 @@ class Lista_doencas(Resource):
 
 
 class Lista_sessoes(Resource):
-    def post(self):
+    def get(self):
         dados = request.json
-        sessao = Sessao.query.all()
-        today = date.today()
-
-
 
         salaCheck = Salas.query.filter_by(nome=dados['nome']).first()
-        responSala = {'nome':salaCheck.nome, 'senha':salaCheck.senha}
-        
         doenca = Doencas.query.all()
+
         shuffle(doenca)
         responDoenca = [{'id':i.id, 'nome':i.nome, 'tipo':i.tipo, 'agente':i.agente,'sintomas':[{'nome':s.nome} for s in i.sintomas], 'transmicao':[{'nome':s.nome} for s in i.transmicao], 'prevencao':[{'nome':s.nome} for s in i.prevencao] } for i in doenca]
 
 
-        codigo = str(today.day)+str(today.month)+str(today.year)+str(salaCheck.id)
+        
+        try:
+            if salaCheck.senha == dados['senha']:
+                response = {'status':True, 'id_sessao':salaCheck.id,'sala':salaCheck.nome, 'doencas':responDoenca}
+            else:
+                response = {'status':False}                
+  
+        except AttributeError:
+            response = {'status':False}
 
-         
-        check = len(Ranking.query.filter_by(id_sessao=codigo).filter_by(rodada=1).all())
-
-        if check >= 1:
-            response = {'status':"Uma sala já está usando essa sessao"}
             
-        else:
-            sessaoCheck = Sessao.query.filter_by(id_sessao=codigo).first()
-            try:
-                response = {'status':True, 'id':sessaoCheck.id_sessao,'sala':responSala, 'doencas':responDoenca}
-            
-            except AttributeError:
-                if salaCheck.senha == dados['senha']:
-                    sessao = Sessao(id_sessao=codigo)
-                    sessao.save()
-                    response = {'status':True, 'id':sessao.id_sessao,'sala':responSala, 'doencas':responDoenca}
-                else:
-                    response = {'status':False}                
         return response
 
 
 
 
 class Jogador(Resource):
+    def get(self, nome, id):
+        jogador = Ranking.query.filter_by(nome=nome).filter_by(id_sessao=id).first()
+        try:
+            response = {
+                'nome' : jogador.nome,
+                'id_sesao' : jogador.id_sessao,
+                'pontuacao' : jogador.pontuacao,
+                'id' : jogador.id
+
+                }
+
+        except AttributeError:
+            response = {'status': 'Error', 'mensagem':'Nome não encontrado'}
+            
+        return response
+    
 
     def delete(self, nome):
         jogador = Ranking.query.filter_by(nome=nome).first()
@@ -438,7 +440,7 @@ class Lista_jogadores(Resource):
         pontuac = Ranking.query.filter_by(id_sessao=dados['id_sessao']).filter_by(nome=dados['nome']).first()
 
         
-        check = len(Ranking.query.filter_by(id_sessao=dados['id_sessao']).filter_by(rodada=1).all())
+        check = len(Ranking.query.filter_by(id_sessao=dados['id_sessao']).filter(Ranking.rodada != 0).all())
 
         if check >= 1:
             response = {
@@ -481,10 +483,21 @@ class Lista_jogadores(Resource):
         return response
 
 
+
 class Encerra_jogadores(Resource):
-    def get(self):
-        Ranking.finaliza()
-        return "Sessão encerrada"
+    def delete(self):
+        dados = request.json
+        jogador = Ranking.query.filter_by(nome=dados['nome']).filter_by(id_sessao=dados['id_sessao']).first()
+
+        try:
+            jogador.delete()
+            response = {'status': True}
+
+        except AttributeError:
+            response = {'status': False}
+
+        return response
+
 
 
 
@@ -497,7 +510,7 @@ class Home(Resource):
 
 api.add_resource(Home, '/')
 
-api.add_resource(Jogador, '/jogador/<string:nome>')
+api.add_resource(Jogador, '/jogador/<string:nome>/<int:id>')
 api.add_resource(Lista_jogadores, '/jogador')
 api.add_resource(Encerra_jogadores, '/jogador/encerra')
 
