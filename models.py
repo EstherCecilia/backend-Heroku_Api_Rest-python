@@ -26,6 +26,12 @@ conecteds = Table('conecteds',Base.metadata,
     )
 
 
+sessaoconect = Table('sessaoconect',Base.metadata, 
+               Column('id_sessao', Integer, ForeignKey('sessoes.id')),
+               Column('id_doenca', Integer, ForeignKey('doencas.id'))
+    )
+
+
 class Transmicaos(Base):
     __tablename__='transmicaos'
     id = Column(Integer, primary_key=True)
@@ -155,6 +161,38 @@ class Ranking(Base):
 
 
 
+
+class Sessao(Base):
+    __tablename__='sessoes'
+    id = Column(Integer, primary_key=True)
+    id_sessao = Column(Integer())
+    rodada = Column(Integer())
+    doencas = relationship("Doencas", secondary=sessaoconect, backref=backref('sessaoconects', lazy='dynamic'))
+    
+    
+
+
+    def __repr__(self):
+        return '<Sessao: {}>'.format(self.id_sessao)
+
+
+    def finaliza():
+        Sessao.__table__.drop(engine)
+        Sessao.__table__.create(engine)
+
+
+    def save(self):
+        db_session.add(self)
+        db_session.commit()
+
+    def delete(self):
+        db_session.delete(self)
+        db_session.commit()
+
+
+
+
+        
 
 def init_db():
     Base.metadata.create_all(bind=engine)

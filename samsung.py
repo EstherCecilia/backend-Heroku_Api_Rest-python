@@ -312,19 +312,17 @@ class Lista_sessoes(Resource):
     def get(self):
         dados = request.json
 
-        salaCheck = Salas.query.filter_by(nome=dados['nome']).first()
+        sessao = Sessao.query.filter_by(id_sessao=dados['id_sessao']).first()
         doenca = Doencas.query.all()
 
         shuffle(doenca)
-        responDoenca = [{'id':i.id, 'nome':i.nome, 'tipo':i.tipo, 'agente':i.agente,'sintomas':[{'nome':s.nome} for s in i.sintomas], 'transmicao':[{'nome':s.nome} for s in i.transmicao], 'prevencao':[{'nome':s.nome} for s in i.prevencao] } for i in doenca]
+        responDoenca = [{'id':i.id, 'nome':i.nome} for i in doenca]
 
-
+        responseSessao = {'id_sessao': sessao.id_sessao, 'rodada':sessao.rodada}
         
         try:
-            if salaCheck.senha == dados['senha']:
-                response = {'status':True, 'id_sessao':salaCheck.id,'sala':salaCheck.nome, 'doencas':responDoenca}
-            else:
-                response = {'status':False}                
+           response = {'status':True, 'sessao':responseSessao, 'doencasSelecionadas':[{'nome':d.nome} for d in sessao.doencas], 'doencas':responDoenca}
+                          
   
         except AttributeError:
             response = {'status':False}
@@ -333,8 +331,64 @@ class Lista_sessoes(Resource):
         return response
 
 
+    
+    def post(self):
+        dados = request.json
+
+        sala = Salas.query.filter_by(nome=dados['nome']).first()
+        doenca = Doencas.query.all()
+
+        shuffle(doenca)
+        responDoenca = [{'id':i.id, 'nome':i.nome} for i in doenca]
 
 
+        
+        sessao = Sessao.query.filter_by(id_sessao=sala.id).first()
+        
+        
+        try:
+            sessao.sala = dados['nome']
+            response = {
+                'status':False
+                
+
+            }
+                 
+  
+        except AttributeError:
+            
+            if sala.senha == dados['senha']:
+                sessaoNova = Sessao(id_sessao=sala.id, rodada=0)
+                sessaoNova.save()
+                response = {'status':True, 'id_sessao':sessaoNova.id_sessao,'sala':sala.nome, 'doencas':responDoenca}
+            else:
+                response = {'status':False}   
+
+            
+        return response
+
+    def put(self):
+        dados = request.json
+        sessao = Sessao.query.filter_by(id_sessao=dados['id_sessao']).first()
+        doenca = Doencas.query.filter_by(nome=dados['doenca']).first()
+
+        try:
+            sessao.rodada = dados['rodada']
+            sessao.save()
+            sessao.doencas.append(doenca)
+            sessao.save()
+
+            response = {'status':True, 'id_sessao':sessao.id_sessao,'rodada':sessao.rodada, 'doencasSelecionadas':[{'nome':d.nome} for d in sessao.doencas]}
+
+        except AttributeError:
+            response = {'status':False}   
+
+            
+        return response
+
+
+
+        
 class Jogador(Resource):
     def get(self, nome, id):
         jogador = Ranking.query.filter_by(nome=nome).filter_by(id_sessao=id).first()
@@ -492,6 +546,15 @@ class Encerra_jogadores(Resource):
         try:
             jogador.delete()
             response = {'status': True}
+
+            '''
+            sessao = Sessao.query.filter_by(id_sessao=dados['id_sessao']).first()
+            try:
+                sessao.delete()
+
+            except AttributeError:
+            '''
+
 
         except AttributeError:
             response = {'status': False}
