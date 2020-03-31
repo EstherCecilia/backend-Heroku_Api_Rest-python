@@ -11,6 +11,23 @@ api = Api(app)
 
 
 
+class SintomaPorDoencas(Resource):
+    def get(self):
+        dados =request.json
+        doenca = Doencas.query.filter_by(nome=dados['nome']).first()
+        
+        try:
+            response = {'sintomas':[{'nome':s.nome} for s in doenca.sintomas]}
+
+                
+
+        except AttributeError:
+            response = {'status': False}
+            
+        return response
+
+
+
 class Sintoma(Resource):
     def get(self, nome):
         sintoma = Sintomas.query.filter_by(nome=nome).first()
@@ -64,6 +81,28 @@ class Lista_sintomas(Resource):
 
         return response
 
+
+
+
+class TransmicaoPorDoencas(Resource):
+    def get(self):
+        dados =request.json
+        doenca = Doencas.query.filter_by(nome=dados['nome']).first()
+        
+        try:
+            response = {'transmicao':[{'nome':s.nome} for s in doenca.transmicao]}
+
+                
+
+        except AttributeError:
+            response = {'status': False}
+            
+        return response
+
+
+
+
+
 class Transmicao(Resource):
     def get(self, nome):
         transmicao = Transmicaos.query.filter_by(nome=nome).first()
@@ -116,6 +155,26 @@ class Lista_transmicaos(Resource):
             }
 
         return response
+
+
+
+
+class PrevencaoPorDoencas(Resource):
+    def get(self):
+        dados =request.json
+        doenca = Doencas.query.filter_by(nome=dados['nome']).first()
+        print(doenca.nome)
+        
+        try:
+            response = {'prevencoes':[{'nome':p.nome} for p in doenca.prevencao]}
+
+                
+
+        except AttributeError:
+            response = {'status': False}
+            
+        return response
+
 
 
 class Prevencao(Resource):
@@ -547,13 +606,14 @@ class Encerra_jogadores(Resource):
             jogador.delete()
             response = {'status': True}
 
-            '''
+            
             sessao = Sessao.query.filter_by(id_sessao=dados['id_sessao']).first()
             try:
                 sessao.delete()
 
             except AttributeError:
-            '''
+                print("Já foi excluido")
+            
 
 
         except AttributeError:
@@ -579,12 +639,15 @@ api.add_resource(Encerra_jogadores, '/jogador/encerra')
 
 api.add_resource(Sintoma, '/sintoma/<string:nome>')
 api.add_resource(Lista_sintomas, '/sintoma')
+api.add_resource(SintomaPorDoencas, '/sintomas')
 
 api.add_resource(Transmicao, '/transmicao/<string:nome>')
 api.add_resource(Lista_transmicaos, '/transmicao')
+api.add_resource(TransmicaoPorDoencas, '/transmicaos')
 
 api.add_resource(Prevencao, '/prevencao/<string:nome>')
 api.add_resource(Lista_prevencoes, '/prevencao')
+api.add_resource(PrevencaoPorDoencas, '/prevencaos')
 
 api.add_resource(Sala, '/sala/<string:nome>')
 api.add_resource(Lista_salas, '/sala')
