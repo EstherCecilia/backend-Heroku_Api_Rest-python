@@ -354,6 +354,7 @@ class Lista_doencas(Resource):
     def get(self):
         doencas = Doencas.query.all()
         response = [{'id':i.id, 'nome':i.nome, 'tipo':i.tipo, 'agente':i.agente, 'sintomas':[{'nome':s.nome} for s in i.sintomas], 'transmicao':[{'nome':s.nome} for s in i.transmicao], 'prevencao':[{'nome':s.nome} for s in i.prevencao]} for i in doencas]
+        
         return response
     
 
@@ -405,12 +406,11 @@ class Lista_sessoes(Resource):
         
         
         try:
-            sessao.sala = dados['nome']
-            response = {
-                'status':False
-                
-
-            }
+            
+            if sala.senha == dados['senha']:
+                response = {'status':False, 'id_sessao':sessao.id_sessao,'sala':sala.nome, 'doencas':responDoenca}
+            else:
+                response = {'status':False}   
                  
   
         except AttributeError:
