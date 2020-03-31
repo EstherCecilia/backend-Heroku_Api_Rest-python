@@ -374,7 +374,7 @@ class Lista_sessoes(Resource):
         doenca = Doencas.query.all()
 
         shuffle(doenca)
-        responDoenca = [{'id':i.id, 'nome':i.nome} for i in doenca]
+        responDoenca = [{'nome':i.nome} for i in doenca]
 
         responseSessao = {'id_sessao': sessao.id_sessao, 'rodada':sessao.rodada}
         
@@ -397,7 +397,7 @@ class Lista_sessoes(Resource):
         doenca = Doencas.query.all()
 
         shuffle(doenca)
-        responDoenca = [{'id':i.id, 'nome':i.nome} for i in doenca]
+        responDoenca = [{'nome':i.nome} for i in doenca]
 
 
         
