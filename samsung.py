@@ -508,7 +508,7 @@ class Lista_jogadores(Resource):
             pontuac.save()
 
 
-            adivinhador.pontuacao = ponti*0.75
+            adivinhador.pontuacao = adivinhador.pontuacao + ponti*0.75
             adivinhador.save()
 
             response = {
