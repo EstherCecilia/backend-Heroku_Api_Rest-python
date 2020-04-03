@@ -169,7 +169,6 @@ class Sessao(Base):
     rodada = Column(Integer())
     doencas = relationship("Doencas", secondary=sessaoconect, backref=backref('sessaoconects', lazy='dynamic'))
     
-    
 
 
     def __repr__(self):
