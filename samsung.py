@@ -476,7 +476,7 @@ class Jogador(Resource):
 class Lista_jogadores(Resource):
     def get(self):
         dados = request.json
-        jogador = Ranking.query.filter_by(id_sessao=dados['id_sessao']).filter_by(adivinhador=True).all()
+        jogador = Ranking.query.filter_by(id_sessao=dados['id_sessao']).all()
         
         jogador_ordenado = sorted(jogador, key = Ranking.get_pontuacao, reverse=True)
         
@@ -485,9 +485,9 @@ class Lista_jogadores(Resource):
 
         jogadorDica = Ranking.query.filter_by(id_sessao=dados['id_sessao']).filter_by(adivinhador=False).first()
 
-        responseDicas = {'nome':jogadorDica.nome, 'pontuacao':jogadorDica.pontuacao}
+        responseDicas = {'nome':jogadorDica.nome}
 
-        response = {'darDica':responseDicas, 'adivinhador':responseAdivinhador}
+        response = {'darDica':responseDicas, 'jogadores':responseAdivinhador}
         return response
 
 
