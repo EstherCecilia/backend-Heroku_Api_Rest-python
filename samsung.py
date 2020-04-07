@@ -380,7 +380,7 @@ class Lista_sessoes(Resource):
         responseSessao = {'id_sessao': sessao.id_sessao, 'rodada':sessao.rodada}
         
         try:
-           response = {'status':True, 'sessao':responseSessao, 'doencasSelecionadas':[{'nome':d.nome} for d in sessao.doencas], 'doencas':responDoenca}
+           response = {'status':True, 'sessao':responseSessao, 'dicas':[{'nome':d.nome} for d in sessao.dicas], 'doencasSelecionadas':[{'nome':d.nome} for d in sessao.doencas], 'doencas':responDoenca}
                           
   
         except AttributeError:
@@ -436,7 +436,21 @@ class Lista_sessoes(Resource):
             sessao.doencas.append(doenca)
             sessao.save()
 
-            response = {'status':True, 'id_sessao':sessao.id_sessao,'rodada':sessao.rodada, 'doencasSelecionadas':[{'nome':d.nome} for d in sessao.doencas]}
+            if 'dica' in dados:
+                dic = Dica(nome=dados['dica'])
+                dic.save()
+
+                try:
+                    dica = Dica.query.filter_by(nome=dados['dica']).first()
+                    sessao.dicas.append(dica)
+                    sessao.save()
+
+                except AttributeError:
+                    print(False)   
+
+        
+
+            response = {'status':True, 'id_sessao':sessao.id_sessao,'rodada':sessao.rodada,'dicas':[{'nome':d.nome} for d in sessao.dicas], 'doencasSelecionadas':[{'nome':d.nome} for d in sessao.doencas]}
 
         except AttributeError:
             response = {'status':False}   
@@ -623,6 +637,28 @@ class Encerra_jogadores(Resource):
 
 
 
+class Listar_Ranking(Resource):
+    def get(self, id):
+        jogador = Ranking.query.filter_by(id_sessao=id).all()
+        try:
+            jogador = Ranking.query.filter_by(id_sessao=id).all()
+            jogador_ordenado = sorted(jogador, key = Ranking.get_pontuacao, reverse=True)
+            responseAdivinhador = [{'nome':i.nome, 'pontuacao':i.pontuacao} for i in jogador_ordenado]
+
+            jogadorDica = Ranking.query.filter_by(id_sessao=id).filter_by(adivinhador=False).first()
+            responseDicas = {'nome':jogadorDica.nome}
+
+            response = {'darDica':responseDicas, 'jogadores':responseAdivinhador}
+
+        except AttributeError:
+            response = {'status': False}
+            
+        
+        return response
+
+
+
+
 class Home(Resource):
     def get(self):
         return "Bem vindo, Adiciona um endpoint para melhor navegar na api"
@@ -632,6 +668,8 @@ class Home(Resource):
 
 api.add_resource(Home, '/')
 
+
+api.add_resource(Listar_Ranking, '/jogador/<int:id>')
 api.add_resource(Jogador, '/jogador/<string:nome>/<int:id>')
 api.add_resource(Lista_jogadores, '/jogador')
 api.add_resource(Encerra_jogadores, '/jogador/encerra')
