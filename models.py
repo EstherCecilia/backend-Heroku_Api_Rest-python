@@ -31,11 +31,10 @@ sessaoconect = Table('sessaoconect',Base.metadata,
                Column('id_doenca', Integer, ForeignKey('doencas.id'))
     )
 
-dicaconect = Table('dicaconect',Base.metadata, 
+sessaoconectdica = Table('sessaoconectdica',Base.metadata, 
                Column('id_sessao', Integer, ForeignKey('sessoes.id')),
                Column('id_dica', Integer, ForeignKey('dicas.id'))
     )
-
 
 class Transmicaos(Base):
     __tablename__='transmicaos'
@@ -113,6 +112,33 @@ class Doencas(Base):
         db_session.commit()
 
 
+
+class Dica(Base):
+    __tablename__='dicas'
+    id = Column(Integer, primary_key=True)
+    nome = Column(String(40))
+    sessao = Column(Integer())
+    
+
+    
+    def __repr__(self):
+        return '<Dica: {}>'.format(self.id)
+
+    def finaliza():
+        Dica.__table__.drop(engine)
+        Dica.__table__.create(engine)
+
+
+    def save(self):
+        db_session.add(self)
+        db_session.commit()
+
+    def delete(self):
+        db_session.delete(self)
+        db_session.commit()
+
+        
+
 class Salas(Base):
     __tablename__='salas'
     id = Column(Integer, primary_key=True)
@@ -166,37 +192,14 @@ class Ranking(Base):
 
 
 
-class Dica(Base):
-    __tablename__='dicas'
-    id = Column(Integer, primary_key=True)
-    nome = Column(String(80))
-
-    
-    def __repr__(self):
-        return '<Dica: {}>'.format(self.nome)
-
-
-    def finaliza():
-        Dica.__table__.drop(engine)
-        Dica.__table__.create(engine)
-
-
-    def save(self):
-        db_session.add(self)
-        db_session.commit()
-
-    def delete(self):
-        db_session.delete(self)
-        db_session.commit()
-
 
 class Sessao(Base):
     __tablename__='sessoes'
     id = Column(Integer, primary_key=True)
     id_sessao = Column(Integer())
     rodada = Column(Integer())
+    dicas = relationship("Dica", secondary=sessaoconectdica, backref=backref('sessaoconectdicas', lazy='dynamic'))
     doencas = relationship("Doencas", secondary=sessaoconect, backref=backref('sessaoconects', lazy='dynamic'))
-    dicas = relationship("Dica", secondary=dicaconect, backref=backref('dicaconects', lazy='dynamic'))
     
 
 
