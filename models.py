@@ -107,6 +107,12 @@ class Doencas(Base):
         db_session.add(self)
         db_session.commit()
 
+    
+    def finaliza():
+        Doencas.__table__.drop(engine)
+        Doencas.__table__.create(engine)
+
+
     def delete(self):
         db_session.delete(self)
         db_session.commit()

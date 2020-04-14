@@ -12,9 +12,8 @@ api = Api(app)
 
 
 class SintomaPorDoencas(Resource):
-    def get(self):
-        dados =request.json
-        doenca = Doencas.query.filter_by(nome=dados['nome']).first()
+    def get(self, nome):
+        doenca = Doencas.query.filter_by(nome=nome).first()
         
         try:
             response = {'sintomas':[{'nome':s.nome} for s in doenca.sintomas]}
@@ -85,9 +84,8 @@ class Lista_sintomas(Resource):
 
 
 class TransmicaoPorDoencas(Resource):
-    def get(self):
-        dados =request.json
-        doenca = Doencas.query.filter_by(nome=dados['nome']).first()
+    def get(self, nome):
+        doenca = Doencas.query.filter_by(nome=nome).first()
         
         try:
             response = {'transmicao':[{'nome':s.nome} for s in doenca.transmicao]}
@@ -160,9 +158,8 @@ class Lista_transmicaos(Resource):
 
 
 class PrevencaoPorDoencas(Resource):
-    def get(self):
-        dados =request.json
-        doenca = Doencas.query.filter_by(nome=dados['nome']).first()
+    def get(self, nome):
+        doenca = Doencas.query.filter_by(nome=nome).first()
         print(doenca.nome)
         
         try:
@@ -682,15 +679,15 @@ api.add_resource(Encerra_jogadores, '/jogador/encerra')
 
 api.add_resource(Sintoma, '/sintoma/<string:nome>')
 api.add_resource(Lista_sintomas, '/sintoma')
-api.add_resource(SintomaPorDoencas, '/sintomas')
+api.add_resource(SintomaPorDoencas, '/sintomas/<string:nome>')
 
 api.add_resource(Transmicao, '/transmicao/<string:nome>')
 api.add_resource(Lista_transmicaos, '/transmicao')
-api.add_resource(TransmicaoPorDoencas, '/transmicaos')
+api.add_resource(TransmicaoPorDoencas, '/transmicaos/<string:nome>')
 
 api.add_resource(Prevencao, '/prevencao/<string:nome>')
 api.add_resource(Lista_prevencoes, '/prevencao')
-api.add_resource(PrevencaoPorDoencas, '/prevencaos')
+api.add_resource(PrevencaoPorDoencas, '/prevencaos/<string:nome>')
 
 api.add_resource(Sala, '/sala/<string:nome>')
 api.add_resource(Lista_salas, '/sala')
