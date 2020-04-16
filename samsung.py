@@ -362,6 +362,26 @@ class Lista_doencas(Resource):
         doenca.save()
         return "Doença inserida com sucesso!"
         
+class Lista_sessao(Resource):
+    def get(self, id):
+
+        sessao = Sessao.query.filter_by(id_sessao=id).first()
+        doenca = Doencas.query.all()
+
+        shuffle(doenca)
+        responDoenca = [{'nome':i.nome} for i in doenca]
+
+        responseSessao = {'id_sessao': sessao.id_sessao, 'rodada':sessao.rodada}
+        
+        try:
+           response = {'status':True, 'sessao':responseSessao,'dicas':[{'nome':d.nome} for d in sessao.dicas], 'doencasSelecionadas':[{'nome':d.nome} for d in sessao.doencas], 'doencas':responDoenca}
+                          
+  
+        except AttributeError:
+            response = {'status':False}
+
+            
+        return response
 
 
 class Lista_sessoes(Resource):
@@ -695,6 +715,7 @@ api.add_resource(Lista_salas, '/sala')
 api.add_resource(Doenca, '/doenca/<string:nome>')
 api.add_resource(Lista_doencas, '/doenca')
 
+api.add_resource(Lista_sessao, '/sessao/<int:id>')
 api.add_resource(Lista_sessoes, '/sessao')
 
 if __name__ == '__main__':
