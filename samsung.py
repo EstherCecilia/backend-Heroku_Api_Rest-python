@@ -371,10 +371,21 @@ class Lista_sessao(Resource):
         shuffle(doenca)
         responDoenca = [{'nome':i.nome} for i in doenca]
 
-        responseSessao = {'id_sessao': sessao.id_sessao, 'rodada':sessao.rodada}
         
         try:
-           response = {'status':True, 'sessao':responseSessao,'dicas':[{'nome':d.nome} for d in sessao.dicas], 'doencasSelecionadas':[{'nome':d.nome} for d in sessao.doencas], 'doencas':responDoenca}
+            print(sessao.dicas)
+            sintomas = [{"sintoma":[{"nome":s.nome} for s in d.sintoma]} for d in sessao.dicas]
+            prevencoes = [{"prevencao":[{"nome":p.nome} for p in d.prevencao]} for d in sessao.dicas]
+            transmicoes = [{"transmicao":[{"nome":t.nome} for t in d.transmicao]} for d in sessao.dicas]
+                
+            reponseDica = [{"sintomas":[{"nome":s.nome} for s in d.sintoma], "prevencoes":[{"nome":p.nome} for p in d.prevencao], "transmicoes":[{"nome":t.nome} for t in d.transmicao]} for d in sessao.dicas]
+                
+        except AttributeError:
+            reponseDica = []
+        
+        try:
+            responseSessao = {'id_sessao': sessao.id_sessao, 'rodada':sessao.rodada}
+            response = {'status':True, 'sessao':responseSessao,'dicas':reponseDica, 'doencasSelecionadas':[{'nome':d.nome} for d in sessao.doencas], 'doencas':responDoenca}
                           
   
         except AttributeError:
@@ -397,7 +408,18 @@ class Lista_sessoes(Resource):
         responseSessao = {'id_sessao': sessao.id_sessao, 'rodada':sessao.rodada}
         
         try:
-           response = {'status':True, 'sessao':responseSessao,'dicas':[{'nome':d.nome} for d in sessao.dicas], 'doencasSelecionadas':[{'nome':d.nome} for d in sessao.doencas], 'doencas':responDoenca}
+            print(sessao.dicas)
+            sintomas = [{"sintoma":[{"nome":s.nome} for s in d.sintoma]} for d in sessao.dicas]
+            prevencoes = [{"prevencao":[{"nome":p.nome} for p in d.prevencao]} for d in sessao.dicas]
+            transmicoes = [{"transmicao":[{"nome":t.nome} for t in d.transmicao]} for d in sessao.dicas]
+                
+            reponseDica = [{"sintomas":[{"nome":s.nome} for s in d.sintoma], "prevencoes":[{"nome":p.nome} for p in d.prevencao], "transmicoes":[{"nome":t.nome} for t in d.transmicao]} for d in sessao.dicas]
+                
+        except AttributeError:
+            reponseDica = []
+        
+        try:
+           response = {'status':True, 'sessao':responseSessao,'dicas':reponseDica, 'doencasSelecionadas':[{'nome':d.nome} for d in sessao.doencas], 'doencas':responDoenca}
                           
   
         except AttributeError:
@@ -446,30 +468,61 @@ class Lista_sessoes(Resource):
         dados = request.json
         sessao = Sessao.query.filter_by(id_sessao=dados['id_sessao']).first()
         doenca = Doencas.query.filter_by(nome=dados['doenca']).first()
-        aux = dados['dica']
-
-        if dados['rodada'] != sessao.rodada:
+        aux = dados['rodada'] - 1
+        
+        if aux != sessao.rodada:
             dicass = Dica.query.filter_by(sessao=dados['id_sessao']).all()
             for item in dicass:
                 item.delete()
 
-        if 'dica' in dados:
-            dic = Dica(sessao=sessao.id_sessao,nome=dados['dica'])
+        if 'dicas' in dados:
+            dic = Dica(sessao=sessao.id_sessao)
             dic.save()
+            if 'sintoma' in dados['dicas']:
+                sintoma = Sintomas.query.filter_by(nome=dados['dicas']['sintoma']).first()
+                try:
+                    dic.sintoma.append(sintoma)
+                    dic.save()
+                except AttributeError:
+                    print("Error")
+            if 'prevencao' in dados['dicas']:
+                prevencao = Prevencoes.query.filter_by(nome=dados['dicas']['prevencao']).first()
+                try:
+                    dic.prevencao.append(prevencao)
+                    dic.save()
+                except AttributeError:
+                    print("Error")
+
+            if 'transmicao' in dados['dicas']:
+                transmicao = Transmicaos.query.filter_by(nome=dados['dicas']['transmicao']).first()
+                try:
+                    dic.transmicao.append(transmicao)
+                    dic.save()
+                except AttributeError:
+                    print("Error")
+
             
         try:
             sessao.rodada = dados['rodada']
             sessao.save()
             sessao.doencas.append(doenca)
             sessao.save()
-            sessao.dicas.append(dic)
+            
+            if 'dicas' in dados:
+                sessao.dicas.append(dic)
             sessao.save()
             try:
-                reponseDica = [{'nome':d.nome} for d in sessao.dicas]
+                print(sessao.dicas)
+                sintomas = [{"sintoma":[{"nome":s.nome} for s in d.sintoma]} for d in sessao.dicas]
+                prevencoes = [{"prevencao":[{"nome":p.nome} for p in d.prevencao]} for d in sessao.dicas]
+                transmicoes = [{"transmicao":[{"nome":t.nome} for t in d.transmicao]} for d in sessao.dicas]
+                
+                reponseDica = [{"sintomas":[{"nome":s.nome} for s in d.sintoma], "prevencoes":[{"nome":p.nome} for p in d.prevencao], "transmicoes":[{"nome":t.nome} for t in d.transmicao]} for d in sessao.dicas]
+                
             except AttributeError:
                 reponseDica = []
 
-            response = {'status':True, 'id_sessao':sessao.id_sessao,'dicas':reponseDica,'rodada':sessao.rodada,'doencasSelecionadas':[{'nome':d.nome} for d in sessao.doencas]}
+            response = {'status':True, 'id_sessao':sessao.id_sessao,'dicas':reponseDica, 'rodada':sessao.rodada,'doencasSelecionadas':[{'nome':d.nome} for d in sessao.doencas]}
 
 
         except AttributeError:
@@ -687,10 +740,15 @@ class Home(Resource):
     def get(self):
         return "Bem vindo, Adiciona um endpoint para melhor navegar na api"
 
+class Time(Resource):
+    def get(self):
+        return {'status':True, 'time':0}
+
 
     
 
 api.add_resource(Home, '/')
+api.add_resource(Time, '/time')
 
 api.add_resource(Listar_Ranking, '/ranking/<int:id>')
 api.add_resource(Jogador, '/jogador/<string:nome>/<int:id>')

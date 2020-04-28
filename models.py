@@ -25,6 +25,22 @@ conecteds = Table('conecteds',Base.metadata,
                Column('id_transmicao', Integer, ForeignKey('transmicaos.id'))
     )
 
+conectedSintoma = Table('conectedSintoma',Base.metadata, 
+               Column('id_dica', Integer, ForeignKey('dicas.id')),
+               Column('id_sintoma', Integer, ForeignKey('sintomas.id'))
+    )
+
+conectedTransmicao = Table('conectedTransmicao',Base.metadata, 
+               Column('id_dica', Integer, ForeignKey('dicas.id')),
+               Column('id_transmicao', Integer, ForeignKey('transmicaos.id'))
+    )
+
+conectedPrevencao = Table('conectedPrevencao',Base.metadata, 
+               Column('id_dica', Integer, ForeignKey('dicas.id')),
+               Column('id_prevencao', Integer, ForeignKey('prevencoes.id'))
+    )
+
+
 
 sessaoconect = Table('sessaoconect',Base.metadata, 
                Column('id_sessao', Integer, ForeignKey('sessoes.id')),
@@ -122,7 +138,9 @@ class Doencas(Base):
 class Dica(Base):
     __tablename__='dicas'
     id = Column(Integer, primary_key=True)
-    nome = Column(String(40))
+    sintoma = relationship('Sintomas', secondary=conectedSintoma, backref=backref('conectedSintomas', lazy='dynamic'))
+    prevencao = relationship("Prevencoes", secondary=conectedPrevencao, backref=backref('conectedPrevencaos', lazy='dynamic'))
+    transmicao = relationship("Transmicaos", secondary=conectedTransmicao, backref=backref('conectedTransmicaos', lazy='dynamic'))
     sessao = Column(Integer())
     
 
