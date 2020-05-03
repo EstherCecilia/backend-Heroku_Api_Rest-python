@@ -46,8 +46,7 @@ class Sintoma(Resource):
         dados = request.json
         if 'nome' in dados:
             sintoma.nome = dados['nome']
-
-        sintoma.save()
+            sintoma.save()
 
         response = {
             'id' : sintoma.id,
@@ -120,8 +119,7 @@ class Transmicao(Resource):
         dados = request.json
         if 'nome' in dados:
             transmicao.nome = dados['nome']
-
-        transmicao.save()
+            transmicao.save()
 
         response = {
             'id' : transmicao.id,
@@ -193,8 +191,7 @@ class Prevencao(Resource):
         dados = request.json
         if 'nome' in dados:
             prevencao.nome = dados['nome']
-
-        prevencao.save()
+            prevencao.save()
 
         response = {
             'id' : prevencao.id,
@@ -326,9 +323,17 @@ class Doenca(Resource):
         dados = request.json
         if 'nome' in dados:
             doenca.nome = dados['nome']
-            
-        doenca.save()
+            doenca.save()
 
+        if 'tipo' in dados:
+            doenca.nome = dados['tipo']
+            doenca.save()
+
+        if 'agente' in dados:
+            doenca.nome = dados['agente']
+            doenca.save()
+
+        
         response = {
                 'nome' : doenca.nome,
                 'tipo' : doenca.tipo,
@@ -402,8 +407,11 @@ class Lista_sessoes(Resource):
         sessao = Sessao.query.filter_by(id_sessao=dados['id_sessao']).first()
         doenca = Doencas.query.all()
 
-        shuffle(doenca)
-        responDoenca = [{'nome':i.nome} for i in doenca]
+        try:
+            responDoenca = [{'nome':i.nome} for i in doenca]    
+        except AttributeError:
+            responDoenca = []
+
 
         responseSessao = {'id_sessao': sessao.id_sessao, 'rodada':sessao.rodada}
         
@@ -436,7 +444,6 @@ class Lista_sessoes(Resource):
         sala = Salas.query.filter_by(nome=dados['nome']).first()
         doenca = Doencas.query.all()
 
-        shuffle(doenca)
         responDoenca = [{'nome':i.nome} for i in doenca]
 
 
@@ -457,6 +464,7 @@ class Lista_sessoes(Resource):
             if sala.senha == dados['senha']:
                 sessaoNova = Sessao(id_sessao=sala.id, rodada=0)
                 sessaoNova.save()
+                sessaoNova.doencas = []
                 response = {'status':True, 'id_sessao':sessaoNova.id_sessao,'sala':sala.nome, 'doencas':responDoenca}
             else:
                 response = {'status':False}   
@@ -742,6 +750,7 @@ class Home(Resource):
 
 class Time(Resource):
     def get(self):
+        #time.sleep(300)
         return {'status':True, 'time':0}
 
 
