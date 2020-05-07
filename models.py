@@ -40,6 +40,21 @@ conectedPrevencao = Table('conectedPrevencao',Base.metadata,
                Column('id_prevencao', Integer, ForeignKey('prevencoes.id'))
     )
 
+conectedSintomaSessao = Table('conectedSintomaSessao',Base.metadata, 
+               Column('id_sessao', Integer, ForeignKey('sessoes.id')),
+               Column('id_sintoma', Integer, ForeignKey('sintomas.id'))
+    )
+
+conectedTransmicaoSessao = Table('conectedTransmicaoSessao',Base.metadata, 
+               Column('id_sessao', Integer, ForeignKey('sessoes.id')),
+               Column('id_transmicao', Integer, ForeignKey('transmicaos.id'))
+    )
+
+conectedPrevencaoSessao = Table('conectedPrevencaoSessao',Base.metadata, 
+               Column('id_sessao', Integer, ForeignKey('sessoes.id')),
+               Column('id_prevencao', Integer, ForeignKey('prevencoes.id'))
+    )
+
 
 
 sessaoconect = Table('sessaoconect',Base.metadata, 
@@ -224,6 +239,9 @@ class Sessao(Base):
     rodada = Column(Integer())
     dicas = relationship("Dica", secondary=sessaoconectdica, backref=backref('sessaoconectdicas', lazy='dynamic'))
     doencas = relationship("Doencas", secondary=sessaoconect, backref=backref('sessaoconects', lazy='dynamic'))
+    sintoma = relationship('Sintomas', secondary=conectedSintomaSessao, backref=backref('conectedSintomasSessao', lazy='dynamic'))
+    prevencao = relationship("Prevencoes", secondary=conectedPrevencaoSessao, backref=backref('conectedPrevencaosSessao', lazy='dynamic'))
+    transmicao = relationship("Transmicaos", secondary=conectedTransmicaoSessao, backref=backref('conectedTransmicaosSessao', lazy='dynamic'))
     
 
 

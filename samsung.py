@@ -378,13 +378,7 @@ class Lista_sessao(Resource):
 
         
         try:
-            print(sessao.dicas)
-            sintomas = [{"sintoma":[{"nome":s.nome} for s in d.sintoma]} for d in sessao.dicas]
-            prevencoes = [{"prevencao":[{"nome":p.nome} for p in d.prevencao]} for d in sessao.dicas]
-            transmicoes = [{"transmicao":[{"nome":t.nome} for t in d.transmicao]} for d in sessao.dicas]
-                
-            reponseDica = [{"sintomas":[{"nome":s.nome} for s in d.sintoma], "prevencoes":[{"nome":p.nome} for p in d.prevencao], "transmicoes":[{"nome":t.nome} for t in d.transmicao]} for d in sessao.dicas]
-                
+            reponseDica = {'sintomas':[{'nome':s.nome} for s in sessao.sintoma], 'transmicao':[{'nome':s.nome} for s in sessao.transmicao], 'prevencao':[{'nome':s.nome} for s in sessao.prevencao]}
         except AttributeError:
             reponseDica = []
         
@@ -416,13 +410,7 @@ class Lista_sessoes(Resource):
         responseSessao = {'id_sessao': sessao.id_sessao, 'rodada':sessao.rodada}
         
         try:
-            print(sessao.dicas)
-            sintomas = [{"sintoma":[{"nome":s.nome} for s in d.sintoma]} for d in sessao.dicas]
-            prevencoes = [{"prevencao":[{"nome":p.nome} for p in d.prevencao]} for d in sessao.dicas]
-            transmicoes = [{"transmicao":[{"nome":t.nome} for t in d.transmicao]} for d in sessao.dicas]
-                
-            reponseDica = [{"sintomas":[{"nome":s.nome} for s in d.sintoma], "prevencoes":[{"nome":p.nome} for p in d.prevencao], "transmicoes":[{"nome":t.nome} for t in d.transmicao]} for d in sessao.dicas]
-                
+            reponseDica = {'sintomas':[{'nome':s.nome} for s in sessao.sintoma], 'transmicao':[{'nome':s.nome} for s in sessao.transmicao], 'prevencao':[{'nome':s.nome} for s in sessao.prevencao]}
         except AttributeError:
             reponseDica = []
         
@@ -462,9 +450,10 @@ class Lista_sessoes(Resource):
         except AttributeError:
             
             if sala.senha == dados['senha']:
-                sessaoNova = Sessao(id_sessao=sala.id, rodada=0)
+                sessaoNova = Sessao(id_sessao=sala.id, rodada=0, dicas=[], doencas=[], sintoma=[], prevencao=[], transmicao=[])
                 sessaoNova.save()
                 sessaoNova.doencas = []
+                sessaoNova.save()
                 response = {'status':True, 'id_sessao':sessaoNova.id_sessao,'sala':sala.nome, 'doencas':responDoenca}
             else:
                 response = {'status':False}   
@@ -476,36 +465,37 @@ class Lista_sessoes(Resource):
         dados = request.json
         sessao = Sessao.query.filter_by(id_sessao=dados['id_sessao']).first()
         doenca = Doencas.query.filter_by(nome=dados['doenca']).first()
-        aux = dados['rodada'] - 1
-        
-        if aux != sessao.rodada:
-            dicass = Dica.query.filter_by(sessao=dados['id_sessao']).all()
-            for item in dicass:
-                item.delete()
+
+        if dados['rodada'] != sessao.rodada and sessao.rodada != 0:
+            sessao.sintoma = []
+            sessao.save()
+            sessao.prevencao = []
+            sessao.save()
+            sessao.transmicao = []
+            sessao.save()
+            
 
         if 'dicas' in dados:
-            dic = Dica(sessao=sessao.id_sessao)
-            dic.save()
             if 'sintoma' in dados['dicas']:
                 sintoma = Sintomas.query.filter_by(nome=dados['dicas']['sintoma']).first()
                 try:
-                    dic.sintoma.append(sintoma)
-                    dic.save()
+                    sessao.sintoma.append(sintoma)
+                    sessao.save()
                 except AttributeError:
                     print("Error")
             if 'prevencao' in dados['dicas']:
                 prevencao = Prevencoes.query.filter_by(nome=dados['dicas']['prevencao']).first()
                 try:
-                    dic.prevencao.append(prevencao)
-                    dic.save()
+                    sessao.prevencao.append(prevencao)
+                    sessao.save()
                 except AttributeError:
                     print("Error")
 
             if 'transmicao' in dados['dicas']:
                 transmicao = Transmicaos.query.filter_by(nome=dados['dicas']['transmicao']).first()
                 try:
-                    dic.transmicao.append(transmicao)
-                    dic.save()
+                    sessao.transmicao.append(transmicao)
+                    sessao.save()
                 except AttributeError:
                     print("Error")
 
@@ -516,21 +506,19 @@ class Lista_sessoes(Resource):
             sessao.doencas.append(doenca)
             sessao.save()
             
-            if 'dicas' in dados:
-                sessao.dicas.append(dic)
-            sessao.save()
             try:
-                print(sessao.dicas)
-                sintomas = [{"sintoma":[{"nome":s.nome} for s in d.sintoma]} for d in sessao.dicas]
-                prevencoes = [{"prevencao":[{"nome":p.nome} for p in d.prevencao]} for d in sessao.dicas]
-                transmicoes = [{"transmicao":[{"nome":t.nome} for t in d.transmicao]} for d in sessao.dicas]
                 
-                reponseDica = [{"sintomas":[{"nome":s.nome} for s in d.sintoma], "prevencoes":[{"nome":p.nome} for p in d.prevencao], "transmicoes":[{"nome":t.nome} for t in d.transmicao]} for d in sessao.dicas]
-                
+                reponseDica = {'sintomas':[{'nome':s.nome} for s in sessao.sintoma], 'transmicao':[{'nome':s.nome} for s in sessao.transmicao], 'prevencao':[{'nome':s.nome} for s in sessao.prevencao]}
             except AttributeError:
                 reponseDica = []
 
-            response = {'status':True, 'id_sessao':sessao.id_sessao,'dicas':reponseDica, 'rodada':sessao.rodada,'doencasSelecionadas':[{'nome':d.nome} for d in sessao.doencas]}
+            try:
+                
+                reponseSelecionadas = [{'nome':d.nome} for d in sessao.doencas]
+            except AttributeError:
+                reponseSelecionadas = []
+
+            response = {'status':True, 'id_sessao':sessao.id_sessao,'dicas':reponseDica, 'rodada':sessao.rodada,'doencasSelecionadas':reponseSelecionadas}
 
 
         except AttributeError:
@@ -674,13 +662,15 @@ class Lista_jogadores(Resource):
 
         if check >= 1:
             response = {
-                'status':"Sessão já foi iniciada"    
+                'status':False,
+                'mensagem':"Sessao já foi iniciada"    
             }
         else:
             try:
                 pontuac.nome = dados['nome']
                 response = {
-                    'status':False
+                'status':False,
+                'mensagem':"Esse nome ja existe"
                 
 
                 }
