@@ -373,7 +373,6 @@ class Lista_sessao(Resource):
         sessao = Sessao.query.filter_by(id_sessao=id).first()
         doenca = Doencas.query.all()
 
-        shuffle(doenca)
         responDoenca = [{'nome':i.nome} for i in doenca]
 
         
@@ -450,7 +449,7 @@ class Lista_sessoes(Resource):
         except AttributeError:
             
             if sala.senha == dados['senha']:
-                sessaoNova = Sessao(id_sessao=sala.id, rodada=0, dicas=[], doencas=[], sintoma=[], prevencao=[], transmicao=[])
+                sessaoNova = Sessao(id_sessao=sala.id, rodada=0,  doencas=[], sintoma=[], prevencao=[], transmicao=[])
                 sessaoNova.save()
                 sessaoNova.doencas = []
                 sessaoNova.save()
