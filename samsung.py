@@ -715,9 +715,6 @@ class Encerra_jogadores(Resource):
             
             sessao = Sessao.query.filter_by(id_sessao=dados['id_sessao']).first()
             try:
-                dicass = Dica.query.filter_by(sessao=dados['id_sessao']).all()
-                for item in dicass:
-                    item.delete()
                 sessao.delete()
 
             except AttributeError:
