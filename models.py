@@ -193,10 +193,10 @@ class Sessao(Base):
     id = Column(Integer, primary_key=True)
     id_sessao = Column(Integer())
     rodada = Column(Integer())
-    doencas = relationship("Doencas", secondary=sessaoconect, backref=backref('sessaoconects', lazy='dynamic'))
-    sintoma = relationship('Sintomas', secondary=conectedSintomaSessao, backref=backref('conectedSintomasSessao', lazy='dynamic'))
-    prevencao = relationship("Prevencoes", secondary=conectedPrevencaoSessao, backref=backref('conectedPrevencaosSessao', lazy='dynamic'))
-    transmicao = relationship("Transmicaos", secondary=conectedTransmicaoSessao, backref=backref('conectedTransmicaosSessao', lazy='dynamic'))
+    doencas = relationship("Doencas", secondary=sessaoconect, backref=backref('sessaoconects', lazy='dynamic', cascade="all, delete-orphan"))
+    sintoma = relationship('Sintomas', secondary=conectedSintomaSessao, backref=backref('conectedSintomasSessao', lazy='dynamic', cascade="all, delete-orphan"))
+    prevencao = relationship("Prevencoes", secondary=conectedPrevencaoSessao, backref=backref('conectedPrevencaosSessao', lazy='dynamic', cascade="all, delete-orphan"))
+    transmicao = relationship("Transmicaos", secondary=conectedTransmicaoSessao, backref=backref('conectedTransmicaosSessao', lazy='dynamic', cascade="all, delete-orphan"))
     
 
 
