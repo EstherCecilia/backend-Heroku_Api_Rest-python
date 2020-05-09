@@ -209,7 +209,12 @@ class Sessao(Base):
 
     def save(self):
         db_session.add(self)
-        db_session.commit()
+        session = Session()
+        try:
+            db_session.commit()
+        except:
+            db_session.rollback()
+            raise
         
     def delete(self):
         db_session.delete(self)
