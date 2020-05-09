@@ -209,7 +209,6 @@ class Sessao(Base):
 
     def save(self):
         db_session.add(self)
-        session = Session()
         try:
             db_session.commit()
         except:
