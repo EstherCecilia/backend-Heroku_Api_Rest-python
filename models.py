@@ -177,21 +177,13 @@ class Ranking(Base):
 
 
     def save(self):
-        try:
-            db_session.add(self)
-            db_session.commit()
-        except:
-            db_session.rollback()
-            raise
-
+        db_session.add(self)
+        db_session.commit()
+        
     def delete(self):
-        try:
-            db_session.delete(self)
-            db_session.commit()
-        except:
-            db_session.rollback()
-            raise
-
+        db_session.delete(self)
+        db_session.commit()
+        
 
 
 class Sessao(Base):
@@ -216,21 +208,13 @@ class Sessao(Base):
 
 
     def save(self):
-        try:
-            db_session.add(self)
-            db_session.commit()
-        except:
-            db_session.rollback()
-            raise
-
+        db_session.add(self)
+        db_session.commit()
+        
     def delete(self):
-        try:
-            db_session.delete(self)
-            db_session.commit()
-        except:
-            db_session.rollback()
-            raise
-
+        db_session.delete(self)
+        db_session.commit()
+        
 
 
 
