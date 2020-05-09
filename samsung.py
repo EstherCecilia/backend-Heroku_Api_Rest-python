@@ -621,7 +621,12 @@ class Lista_jogadores(Resource):
             pontuac.rodada = dados['rodada']
             pontuac.ordem = rodada + 1
             ponti = (1/(pontuac.ordem))*10
-            ponto = pontuac.pontuacao + ponti
+            
+            if dados['fim'] == True :
+                ponto = pontuac.pontuacao
+            else:
+                ponto = pontuac.pontuacao + ponti
+                
             pontuac.pontuacao = ponto
             pontuac.save()
 
