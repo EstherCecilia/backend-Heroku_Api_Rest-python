@@ -455,8 +455,6 @@ class Lista_sessoes(Resource):
             if sala.senha == dados['senha']:
                 sessaoNova = Sessao(id_sessao=sala.id, rodada=0,  doencas=[], sintoma=[], prevencao=[], transmicao=[])
                 sessaoNova.save()
-                sessaoNova.doencas = []
-                sessaoNova.save()
                 response = {'status':True, 'id_sessao':sessaoNova.id_sessao,'sala':sala.nome, 'doencas':responDoenca}
             else:
                 response = {'status':False}   
@@ -728,7 +726,7 @@ class Encerra_jogadores(Resource):
             response = {'status': True}
 
             
-            sessao = Sessao.query.filter_by(id_sessao=dados['id_sessao']).first()
+            sessao = Sessao.query.filter_by(id_sessao=dados['id_sessao']).all()
             try:
                 sessao.delete()
 
