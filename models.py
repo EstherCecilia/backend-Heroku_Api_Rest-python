@@ -93,11 +93,12 @@ class Prevencoes(Base):
     def save(self):
         db_session.add(self)
         db_session.commit()
-        
+
     def delete(self):
         db_session.delete(self)
         db_session.commit()
-        
+
+
 
 
 class Doencas(Base):
@@ -111,13 +112,13 @@ class Doencas(Base):
     agente = Column(String(40))
 
     def __repr__(self):
-        return '{}'.format(self.nome)
+        return '{}'.format(self.sintomas)
 
 
     def save(self):
         db_session.add(self)
         db_session.commit()
-        
+
     
     def finaliza():
         Doencas.__table__.drop(engine)
@@ -147,11 +148,11 @@ class Salas(Base):
     def save(self):
         db_session.add(self)
         db_session.commit()
-        
+
     def delete(self):
         db_session.delete(self)
         db_session.commit()
-        
+
 
 class Ranking(Base):
     __tablename__='ranking'
@@ -179,11 +180,12 @@ class Ranking(Base):
     def save(self):
         db_session.add(self)
         db_session.commit()
-        
+
     def delete(self):
         db_session.delete(self)
         db_session.commit()
-        
+
+
 
 
 class Sessao(Base):
@@ -191,10 +193,10 @@ class Sessao(Base):
     id = Column(Integer, primary_key=True)
     id_sessao = Column(Integer())
     rodada = Column(Integer())
-    doencas = relationship("Doencas", secondary=sessaoconect, backref=backref('sessaoconects', lazy='dynamic'))
-    sintoma = relationship('Sintomas', secondary=conectedSintomaSessao, backref=backref('conectedSintomasSessao', lazy='dynamic'))
-    prevencao = relationship("Prevencoes", secondary=conectedPrevencaoSessao, backref=backref('conectedPrevencaosSessao', lazy='dynamic'))
-    transmicao = relationship("Transmicaos", secondary=conectedTransmicaoSessao, backref=backref('conectedTransmicaosSessao', lazy='dynamic'))
+    doencas = relationship("Doencas", secondary=sessaoconect, cascade='all,delete-orphan', single_parent=True, backref=backref('sessaoconects', lazy='dynamic', cascade="all"))
+    sintoma = relationship('Sintomas', secondary=conectedSintomaSessao, cascade='all,delete-orphan', single_parent=True, backref=backref('conectedSintomasSessao', lazy='dynamic', cascade="all"))
+    prevencao = relationship("Prevencoes", secondary=conectedPrevencaoSessao, cascade='all,delete-orphan', single_parent=True, backref=backref('conectedPrevencaosSessao', lazy='dynamic', cascade="all"))
+    transmicao = relationship("Transmicaos", secondary=conectedTransmicaoSessao, cascade='all,delete-orphan', single_parent=True,backref=backref('conectedTransmicaosSessao', lazy='dynamic', cascade="all"))
     
 
 
@@ -215,10 +217,11 @@ class Sessao(Base):
             db_session.rollback()
             raise
         
+    
     def delete(self):
         db_session.delete(self)
         db_session.commit()
-        
+
 
 
 
@@ -228,5 +231,6 @@ def init_db():
     Base.metadata.create_all(bind=engine)
 
 if __name__ == '__main__':
-
     init_db()
+
+    
