@@ -385,9 +385,12 @@ class Lista_sessao(Resource):
             reponseDica = []
         
         try:
-            tamanho = len(sessao.doencas)
-            
-            doenc = sessao.doencas[tamanho-1].nome
+            try:
+                tamanho = len(sessao.doencas)
+                doenc = sessao.doencas[tamanho-1].nome
+            except IndexError:
+                doenc = ""
+                
             responseSessao = {'id_sessao': sessao.id_sessao, 'rodada':sessao.rodada}
             response = {'status':True, 'sessao':responseSessao,'dicas':reponseDica, 'ultimaDoenca': doenc,'doencasSelecionadas':[{'nome':d.nome} for d in sessao.doencas], 'doencas':responDoenca}
                           
