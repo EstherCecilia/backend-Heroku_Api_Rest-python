@@ -92,12 +92,24 @@ class Prevencoes(Base):
 
     def save(self):
         db_session.add(self)
-        db_session.commit()
+        try:
+            db_session.commit()
+        except:
+            db_session.rollback()
+            raise
+        finally:
+            db_session.close()
 
     def delete(self):
         db_session.delete(self)
-        db_session.commit()
-
+        try:
+            db_session.commit()
+        except:
+            db_session.rollback()
+            raise
+        finally:
+            db_session.close()
+        
 
 
 
@@ -117,7 +129,13 @@ class Doencas(Base):
 
     def save(self):
         db_session.add(self)
-        db_session.commit()
+        try:
+            db_session.commit()
+        except:
+            db_session.rollback()
+            raise
+        finally:
+            db_session.close()
 
     
     def finaliza():
@@ -127,7 +145,13 @@ class Doencas(Base):
 
     def delete(self):
         db_session.delete(self)
-        db_session.commit()
+        try:
+            db_session.commit()
+        except:
+            db_session.rollback()
+            raise
+        finally:
+            db_session.close()
 
 
 
@@ -147,11 +171,23 @@ class Salas(Base):
 
     def save(self):
         db_session.add(self)
-        db_session.commit()
+        try:
+            db_session.commit()
+        except:
+            db_session.rollback()
+            raise
+        finally:
+            db_session.close()
 
     def delete(self):
         db_session.delete(self)
-        db_session.commit()
+        try:
+            db_session.commit()
+        except:
+            db_session.rollback()
+            raise
+        finally:
+            db_session.close()
 
 
 class Ranking(Base):
@@ -179,11 +215,23 @@ class Ranking(Base):
 
     def save(self):
         db_session.add(self)
-        db_session.commit()
+        try:
+            db_session.commit()
+        except:
+            db_session.rollback()
+            raise
+        finally:
+            db_session.close()
 
     def delete(self):
         db_session.delete(self)
-        db_session.commit()
+        try:
+            db_session.commit()
+        except:
+            db_session.rollback()
+            raise
+        finally:
+            db_session.close()
 
 
 
@@ -211,11 +259,23 @@ class Sessao(Base):
 
     def save(self):
         db_session.add(self)
-        db_session.commit()
+        try:
+            db_session.commit()
+        except:
+            db_session.rollback()
+            raise
+        finally:
+            db_session.close()
 
     def delete(self):
         db_session.delete(self)
-        db_session.commit()
+        try:
+            db_session.commit()
+        except:
+            db_session.rollback()
+            raise
+        finally:
+            db_session.close()
 
 
 

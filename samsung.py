@@ -545,7 +545,6 @@ class Lista_sessoes(Resource):
 
 class Listar_Ranking(Resource):
     def get(self, id):
-        jogador = Ranking.query.filter_by(id_sessao=id).all()
         try:
             jogador = Ranking.query.filter_by(id_sessao=id).all()
             jogador_ordenado = sorted(jogador, key = Ranking.get_pontuacao, reverse=True)
