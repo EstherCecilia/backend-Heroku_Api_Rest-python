@@ -373,7 +373,10 @@ class Lista_sessao(Resource):
         sessao = Sessao.query.filter_by(id_sessao=id).first()
         doenca = Doencas.query.all()
 
-        responDoenca = [{'nome':i.nome} for i in doenca]
+        try:
+            responDoenca = [{'nome':i.nome} for i in doenca]
+        except AttributeError:
+            responDoenca = []
 
         
         try:
@@ -382,8 +385,11 @@ class Lista_sessao(Resource):
             reponseDica = []
         
         try:
+            tamanho = len(sessao.doencas)
+            
+            doenc = sessao.doencas[tamanho-1].nome
             responseSessao = {'id_sessao': sessao.id_sessao, 'rodada':sessao.rodada}
-            response = {'status':True, 'sessao':responseSessao,'dicas':reponseDica, 'doencasSelecionadas':[{'nome':d.nome} for d in sessao.doencas], 'doencas':responDoenca}
+            response = {'status':True, 'sessao':responseSessao,'dicas':reponseDica, 'ultimaDoenca': doenc,'doencasSelecionadas':[{'nome':d.nome} for d in sessao.doencas], 'doencas':responDoenca}
                           
   
         except AttributeError:
@@ -502,12 +508,15 @@ class Lista_sessoes(Resource):
         try:
             sessao.rodada = dados['rodada']
             sessao.save()
+            
             sessao.doencas.append(doenca)
             sessao.save()
             
             try:
-                
-                reponseDica = {'sintomas':[{'nome':s.nome} for s in sessao.sintoma], 'transmicao':[{'nome':s.nome} for s in sessao.transmicao], 'prevencao':[{'nome':s.nome} for s in sessao.prevencao]}
+                sintomas = [{'nome':s.nome} for s in sessao.sintoma]
+                transmissoes = [{'nome':s.nome} for s in sessao.transmicao]
+                prevencoes = [{'nome':s.nome} for s in sessao.prevencao]
+                reponseDica = {'sintomas':sintomas, 'transmicao': transmissoes, 'prevencao': prevencoes}
             except AttributeError:
                 reponseDica = []
 
@@ -517,7 +526,9 @@ class Lista_sessoes(Resource):
             except AttributeError:
                 reponseSelecionadas = []
 
-            response = {'status':True, 'id_sessao':sessao.id_sessao,'dicas':reponseDica, 'rodada':sessao.rodada,'doencasSelecionadas':reponseSelecionadas}
+            tamanho = len(sessao.doencas)
+            doenc = sessao.doencas[tamanho-1].nome
+            response = {'status':True, 'id_sessao':sessao.id_sessao,'dicas':reponseDica, 'ultimaDoenca': doenc, 'rodada':sessao.rodada,'doencasSelecionadas':reponseSelecionadas}
 
 
         except AttributeError:
