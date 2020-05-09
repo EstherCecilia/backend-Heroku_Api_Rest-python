@@ -222,8 +222,6 @@ class Sessao(Base):
         except:
             db_session.rollback()
             raise
-        finally:
-            db_session.close()
 
     def delete(self):
         try:
@@ -232,8 +230,6 @@ class Sessao(Base):
         except:
             db_session.rollback()
             raise
-        finally:
-            db_session.close()
 
 
 
