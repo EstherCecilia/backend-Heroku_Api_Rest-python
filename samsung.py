@@ -449,10 +449,7 @@ class Lista_sessoes(Resource):
         
         try:
             
-            if sala.senha == dados['senha']:
-                response = {'status':False, 'id_sessao':sessao.id_sessao,'sala':sala.nome, 'doencas':responDoenca}
-            else:
-                response = {'status':False}   
+            response = {'status':False, 'id_sessao':sessao.id_sessao,'sala':sala.nome, 'doencas':responDoenca}
                  
   
         except AttributeError:
