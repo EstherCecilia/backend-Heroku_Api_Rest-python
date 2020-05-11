@@ -380,7 +380,7 @@ class Lista_sessao(Resource):
 
         
         try:
-            dica = Dicas.query.filter_by(id_sessao=dados['id_sessao']).first()
+            dica = Dicas.query.filter_by(id_sessao=id).first()
             reponseDica = {'sintomas':[{'nome':s.nome} for s in dica.sintoma], 'transmicao':[{'nome':s.nome} for s in dica.transmicao], 'prevencao':[{'nome':s.nome} for s in dica.prevencao]}
         except AttributeError:
             reponseDica = []
