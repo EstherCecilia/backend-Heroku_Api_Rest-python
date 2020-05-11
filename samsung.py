@@ -612,8 +612,11 @@ class Lista_jogadores(Resource):
 
         jogadorDica = Ranking.query.filter_by(id_sessao=dados['id_sessao']).filter_by(adivinhador=False).first()
 
-        responseDicas = {'nome':jogadorDica.nome}
-
+        try:
+            responseDicas = {'nome':jogadorDica.nome}
+        except AttributeError:
+            responseDicas = {'nome':""}
+            
         response = {'darDica':responseDicas, 'jogadores':responseAdivinhador}
         return response
 
