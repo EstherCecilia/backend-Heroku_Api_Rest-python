@@ -380,7 +380,8 @@ class Lista_sessao(Resource):
 
         
         try:
-            reponseDica = {'sintomas':[{'nome':s.nome} for s in sessao.sintoma], 'transmicao':[{'nome':s.nome} for s in sessao.transmicao], 'prevencao':[{'nome':s.nome} for s in sessao.prevencao]}
+            dica = Dicas.query.filter_by(id_sessao=dados['id_sessao']).first()
+            reponseDica = {'sintomas':[{'nome':s.nome} for s in dica.sintoma], 'transmicao':[{'nome':s.nome} for s in dica.transmicao], 'prevencao':[{'nome':s.nome} for s in dica.prevencao]}
         except AttributeError:
             reponseDica = []
         
@@ -417,8 +418,9 @@ class Lista_sessoes(Resource):
 
         responseSessao = {'id_sessao': sessao.id_sessao, 'rodada':sessao.rodada}
         
+        dica = Dicas.query.filter_by(id_sessao=dados['id_sessao']).first()
         try:
-            reponseDica = {'sintomas':[{'nome':s.nome} for s in sessao.sintoma], 'transmicao':[{'nome':s.nome} for s in sessao.transmicao], 'prevencao':[{'nome':s.nome} for s in sessao.prevencao]}
+            reponseDica = {'sintomas':[{'nome':s.nome} for s in dica.sintoma], 'transmicao':[{'nome':s.nome} for s in dica.transmicao], 'prevencao':[{'nome':s.nome} for s in dica.prevencao]}
         except AttributeError:
             reponseDica = []
         
@@ -453,8 +455,11 @@ class Lista_sessoes(Resource):
         except AttributeError:
             
             if sala.senha == dados['senha']:
-                sessaoNova = Sessao(id_sessao=sala.id, rodada=0,  doencas=[], sintoma=[], prevencao=[], transmicao=[])
+                sessaoNova = Sessao(id_sessao=sala.id, rodada=0,  doencas=[])
                 sessaoNova.save()
+                dica = Dicas(id_sessao=sessaoNova.id_sessao, sintoma=[], prevencao=[], transmicao=[])
+                dica.save()
+                print(dica.id)
                 response = {'status':True, 'id_sessao':sessaoNova.id_sessao,'sala':sala.nome, 'doencas':responDoenca}
             else:
                 response = {'status':False}   
@@ -466,37 +471,40 @@ class Lista_sessoes(Resource):
         dados = request.json
         sessao = Sessao.query.filter_by(id_sessao=dados['id_sessao']).first()
         doenca = Doencas.query.filter_by(nome=dados['doenca']).first()
+        dica = Dicas.query.filter_by(id_sessao=dados['id_sessao']).first()
 
-        if dados['rodada'] != sessao.rodada and sessao.rodada != 0:
-            sessao.sintoma = []
-            sessao.save()
-            sessao.prevencao = []
-            sessao.save()
-            sessao.transmicao = []
-            sessao.save()
+        print(sessao.rodada)
+        
+        if dados['rodada'] != sessao.rodada:
+            print(dica.id)
+            dics = db_session.query(conectedSintomaSessaos).filter(conectedSintomaSessaos.c.id_sessao == dica.id)
+            dics.delete(synchronize_session=False)
+            db_session.commit()
             
-
+            
+                           
         if 'dicas' in dados:
             if 'sintoma' in dados['dicas']:
                 sintoma = Sintomas.query.filter_by(nome=dados['dicas']['sintoma']).first()
                 try:
-                    sessao.sintoma.append(sintoma)
-                    sessao.save()
+                    print(sintoma.nome)
+                    dica.sintoma.append(sintoma)
+                    dica.save()
                 except AttributeError:
                     print("Error")
             if 'prevencao' in dados['dicas']:
                 prevencao = Prevencoes.query.filter_by(nome=dados['dicas']['prevencao']).first()
                 try:
-                    sessao.prevencao.append(prevencao)
-                    sessao.save()
+                    dica.prevencao.append(prevencao)
+                    dica.save()
                 except AttributeError:
                     print("Error")
 
             if 'transmicao' in dados['dicas']:
                 transmicao = Transmicaos.query.filter_by(nome=dados['dicas']['transmicao']).first()
                 try:
-                    sessao.transmicao.append(transmicao)
-                    sessao.save()
+                    dica.transmicao.append(transmicao)
+                    dica.save()
                 except AttributeError:
                     print("Error")
 
@@ -509,9 +517,9 @@ class Lista_sessoes(Resource):
             sessao.save()
             
             try:
-                sintomas = [{'nome':s.nome} for s in sessao.sintoma]
-                transmissoes = [{'nome':s.nome} for s in sessao.transmicao]
-                prevencoes = [{'nome':s.nome} for s in sessao.prevencao]
+                sintomas = [{'nome':s.nome} for s in dica.sintoma]
+                transmissoes = [{'nome':s.nome} for s in dica.transmicao]
+                prevencoes = [{'nome':s.nome} for s in dica.prevencao]
                 reponseDica = {'sintomas':sintomas, 'transmicao': transmissoes, 'prevencao': prevencoes}
             except AttributeError:
                 reponseDica = []
