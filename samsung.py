@@ -481,6 +481,14 @@ class Lista_sessoes(Resource):
             dics.delete(synchronize_session=False)
             db_session.commit()
             
+            dics2 = db_session.query(conectedTransmicaoSessaos).filter(conectedTransmicaoSessaos.c.id_sessao == dica.id)
+            dics2.delete(synchronize_session=False)
+            db_session.commit()
+            
+            dics3 = db_session.query(conectedPrevencaoSessaos).filter(conectedPrevencaoSessaos.c.id_sessao == dica.id)
+            dics3.delete(synchronize_session=False)
+            db_session.commit()
+            
             
                            
         if 'dicas' in dados:
@@ -554,7 +562,7 @@ class Listar_Ranking(Resource):
             jogadorDica = Ranking.query.filter_by(id_sessao=id).filter_by(adivinhador=False).first()
             responseDicas = {'nome':jogadorDica.nome}
 
-            response = {'darDica':responseDicas, 'jogadores':responseAdivinhador}
+            response = {'status': True, 'darDica':responseDicas, 'jogadores':responseAdivinhador}
 
         except AttributeError:
             response = {'status': False}
