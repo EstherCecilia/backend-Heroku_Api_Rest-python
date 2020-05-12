@@ -557,11 +557,16 @@ class Listar_Ranking(Resource):
         try:
             jogador = Ranking.query.filter_by(id_sessao=id).all()
             jogador_ordenado = sorted(jogador, key = Ranking.get_pontuacao, reverse=True)
-            responseAdivinhador = [{'nome':i.nome, 'pontuacao':i.pontuacao} for i in jogador_ordenado]
+            try:
+                responseAdivinhador = [{'nome':i.nome, 'pontuacao':i.pontuacao} for i in jogador_ordenado]
+            except AttributeError:
+                responseAdivinhador = [{'nome':"Saiu", 'pontuacao':0}]
 
             jogadorDica = Ranking.query.filter_by(id_sessao=id).filter_by(adivinhador=False).first()
-            responseDicas = {'nome':jogadorDica.nome}
-
+            try:
+                responseDicas = {'nome':jogadorDica.nome}
+            except AttributeError:
+                responseDicas = {'nome':"Saiu"}
             response = {'status': True, 'darDica':responseDicas, 'jogadores':responseAdivinhador}
 
         except AttributeError:
@@ -674,9 +679,14 @@ class Lista_jogadores(Resource):
             adivinhador.save()
             adivinhador.ordem = 300
             adivinhador.save()
-            jogadorVelho = Ranking.query.filter_by(id_sessao=dados['id_sessao']).filter_by(ordem=1).first()
-            jogadorVelho.adivinhador = False
-            jogadorVelho.save()
+
+            aux = Ranking.query.filter_by(id_sessao=dados['id_sessao']).filter(Ranking.ordem!=300).all()
+            jogadorVelho = sorted(aux, key=None, reverse=False)
+            try:
+                jogadorVelho[0].adivinhador = False
+                jogadorVelho[0].save()
+            except IndexError:
+                print("Error")
 
         
         
