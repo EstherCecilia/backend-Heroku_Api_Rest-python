@@ -268,6 +268,18 @@ class Sala(Resource):
         return {'status': 'sucesso', 'mensagem': 'Registro excluido'}
 
 
+class Start(Resource):
+    def get(self, id):
+        sala = Salas.query.filter_by(id=id).first()
+        try:
+            sala.partida = True
+            sala.save()
+            response = {'status':True}
+        except AttributeError:
+            response = {'status':False}
+        return response
+    
+
 class Lista_salas(Resource):
     def get(self):
         sala = Salas.query.all()
@@ -287,7 +299,7 @@ class Lista_salas(Resource):
             }
 
         except AttributeError:
-            sala = Salas(nome=dados['nome'], senha=dados['senha'])
+            sala = Salas(nome=dados['nome'], senha=dados['senha'], partida=False)
             sala.save()
             response = {
                     'status':True,
@@ -698,10 +710,10 @@ class Lista_jogadores(Resource):
         dados = request.json
         pontuac = Ranking.query.filter_by(id_sessao=dados['id_sessao']).filter_by(nome=dados['nome']).first()
 
+        sala = Salas.query.filter_by(id=dados['id_sessao']).first()
         
-        check = len(Ranking.query.filter_by(id_sessao=dados['id_sessao']).filter(Ranking.rodada != 0).all())
 
-        if check >= 1:
+        if sala.partida:
             response = {
                 'status':False,
                 'mensagem':"Sessao já foi iniciada"    
@@ -756,8 +768,12 @@ class Encerra_jogadores(Resource):
 
             
             sessao = Sessao.query.filter_by(id_sessao=dados['id_sessao']).all()
+            sala = Salas.query.filter_by(id=dados['id_sessao']).first()
+            
             try:
                 sessao.delete()
+                sala.partida = False
+                sala.save()
 
             except AttributeError:
                 print("Já foi excluido")
@@ -786,6 +802,7 @@ class Time(Resource):
 
 api.add_resource(Home, '/')
 api.add_resource(Time, '/time')
+api.add_resource(Start, '/setRodada/<int:id>')
 
 api.add_resource(Listar_Ranking, '/ranking/<int:id>')
 api.add_resource(Jogador, '/jogador/<string:nome>/<int:id>')

@@ -172,6 +172,7 @@ class Salas(Base):
     id = Column(Integer, primary_key=True)
     nome = Column(String(40))
     senha = Column(String(40))
+    partida = Column(Boolean())
     
 
 
@@ -181,6 +182,10 @@ class Salas(Base):
     def save(self):
         db_session.add(self)
         db_session.commit()
+
+    def finaliza():
+        Salas.__table__.drop(engine)
+        Salas.__table__.create(engine)
 
     def delete(self):
         db_session.delete(self)
