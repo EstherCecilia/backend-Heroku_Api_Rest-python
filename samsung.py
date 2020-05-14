@@ -268,13 +268,22 @@ class Sala(Resource):
         return {'status': 'sucesso', 'mensagem': 'Registro excluido'}
 
 
-class Start(Resource):
+class SetStart(Resource):
     def get(self, id):
         sala = Salas.query.filter_by(id=id).first()
         try:
             sala.partida = True
             sala.save()
             response = {'status':True}
+        except AttributeError:
+            response = {'status':False}
+        return response
+
+class GetStart(Resource):
+    def get(self, id):
+        sala = Salas.query.filter_by(id=id).first()
+        try:
+            response = {'status':sala.partida}
         except AttributeError:
             response = {'status':False}
         return response
@@ -802,7 +811,8 @@ class Time(Resource):
 
 api.add_resource(Home, '/')
 api.add_resource(Time, '/time')
-api.add_resource(Start, '/setRodada/<int:id>')
+api.add_resource(SetStart, '/setComecou/<int:id>')
+api.add_resource(GetStart, '/getComecou/<int:id>')
 
 api.add_resource(Listar_Ranking, '/ranking/<int:id>')
 api.add_resource(Jogador, '/jogador/<string:nome>/<int:id>')
