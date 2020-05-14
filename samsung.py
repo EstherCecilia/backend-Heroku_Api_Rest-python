@@ -614,7 +614,6 @@ class Lista_jogadores(Resource):
         response = {'darDica':responseDicas, 'jogadores':responseAdivinhador}
         return response
 
-
     def put(self):
         dados = request.json
         pontuac = Ranking.query.filter_by(nome=dados['nome']).filter_by(id_sessao=dados['id_sessao']).filter_by(adivinhador=True).first()
@@ -641,6 +640,8 @@ class Lista_jogadores(Resource):
 
             adivinhador.pontuacao = adivinhador.pontuacao + ponti*0.75
             adivinhador.save()
+            adivinhador.rodada = dados['rodada']
+            adivinhador.save()
 
             response = {
                 'status':True,
@@ -662,7 +663,7 @@ class Lista_jogadores(Resource):
             }
 
         x = len(Ranking.query.filter_by(rodada=dados['rodada']).filter_by(id_sessao=dados['id_sessao']).all())
-        y = len(Ranking.query.filter_by(id_sessao=dados['id_sessao']).all()) - 1
+        y = len(Ranking.query.filter_by(id_sessao=dados['id_sessao']).all()) 
         if y == x:
             adivinhador.adivinhador = True
             adivinhador.save()
@@ -670,10 +671,9 @@ class Lista_jogadores(Resource):
             adivinhador.save()
 
             aux = Ranking.query.filter_by(id_sessao=dados['id_sessao']).filter(Ranking.ordem!=300).all()
-            jogadorVelho = sorted(aux, key=None, reverse=False)
             try:
-                jogadorVelho[0].adivinhador = False
-                jogadorVelho[0].save()
+                aux[0].adivinhador = False
+                aux[0].save()
             except IndexError:
                 print("Error")
 
@@ -681,6 +681,7 @@ class Lista_jogadores(Resource):
         
 
         return response
+
 
         
     def post(self):
