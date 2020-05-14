@@ -425,38 +425,6 @@ class Lista_sessao(Resource):
 
 
 class Lista_sessoes(Resource):
-    def get(self):
-        dados = request.json
-
-        sessao = Sessao.query.filter_by(id_sessao=dados['id_sessao']).first()
-        doenca = Doencas.query.all()
-
-        try:
-            responDoenca = [{'nome':i.nome} for i in doenca]    
-        except AttributeError:
-            responDoenca = []
-
-
-        responseSessao = {'id_sessao': sessao.id_sessao, 'rodada':sessao.rodada}
-        
-        dica = Dicas.query.filter_by(id_sessao=dados['id_sessao']).first()
-        try:
-            reponseDica = {'sintomas':[{'nome':s.nome} for s in dica.sintoma], 'transmicao':[{'nome':s.nome} for s in dica.transmicao], 'prevencao':[{'nome':s.nome} for s in dica.prevencao]}
-        except AttributeError:
-            reponseDica = []
-        
-        try:
-           response = {'status':True, 'sessao':responseSessao,'dicas':reponseDica, 'doencasSelecionadas':[{'nome':d.nome} for d in sessao.doencas], 'doencas':responDoenca}
-                          
-  
-        except AttributeError:
-            response = {'status':False}
-
-            
-        return response
-
-
-    
     def post(self):
         dados = request.json
 
