@@ -96,6 +96,10 @@ class Transmicaos(Base):
     def delete(self):
         db_session.delete(self)
         db_session.commit()
+
+    def finaliza():
+        Transmicaos.__table__.drop(engine)
+        Transmicaos.__table__.create(engine)
         
 
 class Sintomas(Base):
@@ -113,6 +117,10 @@ class Sintomas(Base):
     def delete(self):
         db_session.delete(self)
         db_session.commit()
+
+    def finaliza():
+        Sintomas.__table__.drop(engine)
+        Sintomas.__table__.create(engine)
         
 
 class Prevencoes(Base):
@@ -131,7 +139,9 @@ class Prevencoes(Base):
         db_session.delete(self)
         db_session.commit()
 
-
+    def finaliza():
+        Prevencoes.__table__.drop(engine)
+        Prevencoes.__table__.create(engine)
 
 
 class Doencas(Base):
