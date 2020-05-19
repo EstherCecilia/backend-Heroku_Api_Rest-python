@@ -670,13 +670,10 @@ class Lista_jogadores(Resource):
             adivinhador.ordem = 300
             adivinhador.save()
 
-            aux = Ranking.query.filter_by(id_sessao=dados['id_sessao']).filter(Ranking.ordem!=300).all()
-            try:
-                aux[0].adivinhador = False
-                aux[0].save()
-            except IndexError:
-                print("Error")
-
+            aux = Ranking.query.filter_by(id_sessao=dados['id_sessao']).filter(Ranking.ordem!=300).fisrt()
+            aux.adivinhador = False
+            aux.save()
+            
         
         
 
