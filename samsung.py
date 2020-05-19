@@ -670,7 +670,7 @@ class Lista_jogadores(Resource):
             adivinhador.ordem = 300
             adivinhador.save()
 
-            aux = Ranking.query.filter(Ranking.ordem!=300, Ranking.id_sessao==dados['rodada']).first()
+            aux = Ranking.query.filter_by(id_sessao=dados['id_sessao']).first()
             aux.adivinhador = False
             aux.save()
             
