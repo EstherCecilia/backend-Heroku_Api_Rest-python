@@ -736,23 +736,22 @@ class Encerra_jogadores(Resource):
     def delete(self):
         dados = request.json
         jogador = Ranking.query.filter_by(nome=dados['nome']).filter_by(id_sessao=dados['id_sessao']).first()
-        jogadores = Ranking.query.filter_by(id_sessao=dados['id_sessao']).all()
 
         try:
             jogador.delete()
             response = {'status': True}
 
-            if(jogadores.length == 1):
-                sessao = Sessao.query.filter_by(id_sessao=dados['id_sessao']).all()
-                sala = Salas.query.filter_by(id=dados['id_sessao']).first()
             
-                try:
-                    sessao.delete()
-                    sala.partida = False
-                    sala.save()
+            sessao = Sessao.query.filter_by(id_sessao=dados['id_sessao']).all()
+            sala = Salas.query.filter_by(id=dados['id_sessao']).first()
+            
+            try:
+                sessao.delete()
+                sala.partida = False
+                sala.save()
 
-                except AttributeError:
-                    print("Já foi excluido")
+            except AttributeError:
+                print("Já foi excluido")
             
 
 
