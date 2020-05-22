@@ -742,7 +742,7 @@ class Encerra_jogadores(Resource):
             jogador.delete()
             response = {'status': True}
 
-            if(jogadores.length == 1)
+            if(jogadores.length == 1):
                 sessao = Sessao.query.filter_by(id_sessao=dados['id_sessao']).all()
                 sala = Salas.query.filter_by(id=dados['id_sessao']).first()
             
