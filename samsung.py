@@ -637,11 +637,13 @@ class Lista_jogadores(Resource):
             pontuac.pontuacao = ponto
             pontuac.save()
 
-
-            adivinhador.pontuacao = adivinhador.pontuacao + ponti*0.75
-            adivinhador.save()
-            adivinhador.rodada = dados['rodada']
-            adivinhador.save()
+            try:
+                adivinhador.pontuacao = adivinhador.pontuacao + ponti*0.75
+                adivinhador.save()
+                adivinhador.rodada = dados['rodada']
+                adivinhador.save()
+            except AttributeError:
+                print("O diqueiro saiu da partida!")
 
             response = {
                 'status':True,
@@ -665,11 +667,13 @@ class Lista_jogadores(Resource):
         x = len(Ranking.query.filter_by(rodada=dados['rodada']).filter_by(id_sessao=dados['id_sessao']).all())
         y = len(Ranking.query.filter_by(id_sessao=dados['id_sessao']).all()) 
         if y == x:
-            
-            adivinhador.adivinhador = True
-            adivinhador.save()
-            adivinhador.ordem = 300
-            adivinhador.save()
+            try:
+                adivinhador.adivinhador = True
+                adivinhador.save()
+                adivinhador.ordem = 300
+                adivinhador.save()
+            except AttributeError:
+                print("O diqueiro saiu da partida!")
             
             
 
