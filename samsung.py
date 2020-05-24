@@ -665,20 +665,26 @@ class Lista_jogadores(Resource):
         x = len(Ranking.query.filter_by(rodada=dados['rodada']).filter_by(id_sessao=dados['id_sessao']).all())
         y = len(Ranking.query.filter_by(id_sessao=dados['id_sessao']).all()) 
         if y == x:
+            
             adivinhador.adivinhador = True
             adivinhador.save()
             adivinhador.ordem = 300
             adivinhador.save()
+            
+            
 
-            aux = Ranking.query.filter_by(rodada=dados['rodada']).first()
-            aux.adivinhador = False
-            aux.save()
+            aux = Ranking.query.filter_by(rodada=dados['rodada']).all()
+            shuffle(aux)
+            aux[0].adivinhador = False
+            aux[0].save()
+            print(aux[0].adivinhador)
+        db_session.commit()
+            
             
         
         
 
         return response
-
 
         
     def post(self):
